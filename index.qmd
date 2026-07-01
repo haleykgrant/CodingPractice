@@ -1,0 +1,61 @@
+---
+title: "R Coding Practice"
+listing:
+  - id: Module1
+    contents: "M1*.qmd"
+    type: table
+    categories: true
+    sort-ui: false
+    filter-ui: false
+  - id: Module2
+    contents: "M2*.qmd"
+    type: table
+    categories: true
+    sort-ui: false
+    filter-ui: false
+  - id: Module3
+    contents: "M3*.qmd"
+    type: table
+    categories: true
+    sort-ui: false
+    filter-ui: false
+  - id: Module4
+    contents: "M4*.qmd"
+    type: table
+    categories: true
+    sort-ui: false
+    filter-ui: false
+  - id: Module5
+    contents: "M5*.qmd"
+    type: table
+    categories: true
+    sort-ui: false
+    filter-ui: false
+page-layout: full
+title-block-banner: rainbow.jpg
+title-block-banner-color: "black"
+---
+
+## Module 1
+
+::: {#Module1}
+:::
+
+## Module 2
+
+::: {#Module2}
+:::
+
+## Module 3
+
+::: {#Module3}
+:::
+
+## Module 4
+
+::: {#Module4}
+:::
+## Module 5
+
+::: {#Module5}
+:::
