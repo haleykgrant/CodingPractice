@@ -2,8 +2,4 @@
 title: "About"
 ---
 
-About this site
-
-```{r}
-1 + 1
-```
+This site contains extra coding examples to help students improve their R programming skills for introductory biostatistics courses.

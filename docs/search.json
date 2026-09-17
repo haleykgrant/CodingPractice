@@ -81,7 +81,7 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "This site contains extra coding examples to help students improve their R programming skills for introductory biostatistics courses."
   },
   {
     "objectID": "modules/module1/dataviz_summary.html",
