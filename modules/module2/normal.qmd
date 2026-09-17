@@ -1,0 +1,372 @@
+---
+title: "Module 2: Probability and Inference"
+description: "Fill-in-the-blank coding exercises for Module 2: Normal Distributions"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+  progressive-reveal: true
+title-block-banner: "#7d94c9"
+title-block-banner-color: white
+---
+
+## Probability Distributions
+
+In this section we will practice calculating probabilities using different probability distributions.  In the last section, we worked with the binomial distribution; now, we turn to the normal distribution. 
+
+
+## Normal Distributions
+
+Unlike the binomial distribution, which describes a **discrete** outcome (a count), the normal distribution describes a **continuous** outcome. It is a bell-shaped, symmetric distribution defined by two parameters: the mean ($\mu$) and the standard deviation ($\sigma$).
+
+We will use the following running example: __birth weight__ in the U.S. can be reasonably modeled with a normal distribution with a mean of __3,250 grams__ and a standard deviation of __550 grams__. A birth weight of __2,500 grams or less__ is considered "low birth weight."
+
+### Visualizing the Normal Distribution
+
+To start, let's get a sense of what this distribution looks like by simulating a large number of birth weights and plotting the results.
+
+```{code-blanks-instructions}
+Fill in the code below to randomly draw __100,000 birth weights__ from a normal distribution with __mean = 3250__ and __sd = 550__. Save the result in a data frame called `births` with a column called `weight`. Then plot a histogram of the simulated weights.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 100000
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# set random seed for reproducibility
+set.seed(123)
+# simulate birth weights from a normal distribution
+births = data.frame(weight = rnorm(n = 100000, mean = 3250, sd = 550))
+
+# plot the distribution
+births %>%
+  ggplot(aes(x = weight)) +
+  geom_histogram(fill = "blue", bins = 40) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# set random seed for reproducibility
+set.seed(123)
+# simulate birth weights from a normal distribution
+births = data.frame(weight = rnorm(n = 100000, mean = 3250, sd = 550))
+
+# plot the distribution
+births %>%
+  ggplot(aes(x = weight)) +
+  geom_histogram(fill = "blue", bins = 40) +
+  theme_bw()
+```
+
+You should see a bell-shaped, symmetric histogram centered around 3,250, with most values falling roughly between 1,600 and 4,900 (within 3 standard deviations of the mean). Since this is randomly generated, the exact shape of your bars may differ slightly depending on your R version and setup, but the overall shape and center should look the same.
+:::
+
+```{code-blanks-response}
+Check the mean and standard deviation of your simulated `births$weight` column using `mean()` and `sd()`. Are they close to the true parameters (3250 and 550) we used to generate the data? Why aren't they exactly equal?
+```
+
+Just like with the binomial distribution, we could use this simulated data to estimate probabilities empirically. However, because the normal distribution has a known mathematical form, R gives us functions to calculate **exact** probabilities directly&mdash;no simulation required.
+
+### Normal Probabilities in R
+
+Recall the key functions for working with the normal distribution:
+
+- `pnorm(q, mean, sd)` gives $P(X \le q)$ from a $X \sim Normal(mean, sd)$ distribution
+- `pnorm(q, mean, sd, lower.tail = FALSE)` gives $P(X > q)$
+- `qnorm(p, mean, sd)` gives the value $x$ such that $P(X \le x) = p$ (i.e., the inverse of `pnorm`)
+
+If you don't specify `mean` and `sd`, R assumes you want the **standard normal distribution** ($\mu = 0$, $\sigma = 1$).
+
+### Calculating a Lower-Tail Probability
+
+```{code-blanks-instructions}
+Use `pnorm()` to find the probability that a randomly selected newborn has __low birth weight__ (birth weight $\le$ 2,500 grams), assuming birth weight follows a $Normal(3250, 550)$ distribution.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 2500
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# probability of low birth weight
+pnorm(q = 2500, mean = 3250, sd = 550)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability of low birth weight
+pnorm(q = 2500, mean = 3250, sd = 550)
+```
+[[1] 0.08634102]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+There is about an __8.6% chance__ that a randomly selected newborn has low birth weight.
+:::
+
+### Standardizing: Working with Z-Scores
+
+Instead of working directly with birth weight ($X$), we can **standardize** to the standard normal distribution by converting to a Z-score: $Z = \dfrac{X - \mu}{\sigma}$. A Z-score tells us how many standard deviations a value is from the mean.
+
+```{code-blanks-instructions}
+First, calculate the Z-score corresponding to a birth weight of 2,500 grams (using $\mu = 3250$ and $\sigma = 550$). Then use `pnorm()` on that Z-score (using the __default__ mean and sd, i.e. the standard normal) to confirm you get the __same probability__ as above.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 2500
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# calculate the Z-score for a birth weight of 2500 grams
+z = (2500 - 3250) / 550
+
+# probability using the standard normal distribution
+pnorm(z)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# calculate the Z-score for a birth weight of 2500 grams
+z = (2500 - 3250) / 550
+z
+```
+[[1] -1.363636]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+```r
+# probability using the standard normal distribution
+pnorm(z)
+```
+[[1] 0.08634102]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Same answer as before! A birth weight of 2,500 grams is about __1.36 standard deviations below the mean__.
+:::
+
+### Calculating an Upper-Tail Probability
+
+```{code-blanks-instructions}
+Suppose birth weights __above 4,000 grams__ are flagged as unusually high. Use `pnorm()` with `lower.tail = FALSE` to find the probability that a randomly selected newborn's weight exceeds 4,000 grams.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 4000
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# probability of birth weight greater than 4000 grams
+pnorm(q = 4000, mean = 3250, sd = 550, lower.tail = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability of birth weight greater than 4000 grams
+pnorm(q = 4000, mean = 3250, sd = 550, lower.tail = F)
+```
+[[1] 0.08634102]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Notice this is the __same probability__ we calculated for low birth weight! That's not a coincidence: 2,500 is 750 grams *below* the mean (3250), and 4,000 is 750 grams *above* the mean. Because the normal distribution is symmetric, $P(X \le \mu - c) = P(X \ge \mu + c)$ for any constant $c$.
+:::
+
+### Calculating a Middle Probability
+
+```{code-blanks-instructions}
+Find the probability that a randomly selected birth weight falls __between 2,700 and 3,800 grams__.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 3800
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 2700
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# probability of birth weight between 2700 and 3800 grams
+pnorm(q = 3800, mean = 3250, sd = 550) - pnorm(q = 2700, mean = 3250, sd = 550)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability of birth weight between 2700 and 3800 grams
+pnorm(q = 3800, mean = 3250, sd = 550) - pnorm(q = 2700, mean = 3250, sd = 550)
+```
+[[1] 0.6826895]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Notice that 2,700 and 3,800 are exactly __one standard deviation below and above the mean__ (3250 &minus; 550 = 2700; 3250 + 550 = 3800). This is why the probability is so close to __68%__&mdash;this is the __Empirical Rule__ in action!
+:::
+
+```{code-blanks-response}
+Using what you know about the Empirical Rule, what would you expect the probability to be that a birth weight falls between 2,150 and 4,350 grams (within 2 standard deviations of the mean)? Check your intuition using `pnorm()`.
+```
+
+### Working Backwards with `qnorm()`
+
+Sometimes we want to go the other direction: instead of starting with a value and finding a probability, we start with a probability and find the corresponding value. This is what `qnorm()` does.
+
+```{code-blanks-instructions}
+Find the birth weight that corresponds to the __10th percentile__ of the distribution (i.e., the value below which only 10% of birth weights fall).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.1
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# birth weight at the 10th percentile
+qnorm(p = 0.1, mean = 3250, sd = 550)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# birth weight at the 10th percentile
+qnorm(p = 0.1, mean = 3250, sd = 550)
+```
+[[1] 2545.147]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Only 10% of newborns in this population have a birth weight below about __2,545 grams__.
+:::
+
+```{code-blanks-instructions}
+Now find the range of birth weights that captures the __middle 95%__ of the distribution (i.e., the values corresponding to the 2.5th and 97.5th percentiles). __Hint:__ you can pass a vector of probabilities, `c(0.025, 0.975)`, to `qnorm()` to get both values at once.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.025
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.975
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 3250
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 550
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# birth weight range for the middle 95%
+qnorm(p = c(0.025, 0.975), mean = 3250, sd = 550)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# birth weight range for the middle 95%
+qnorm(p = c(0.025, 0.975), mean = 3250, sd = 550)
+```
+[[1] 2172.02 4327.98]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+95% of birth weights in this population fall between about __2,172 grams and 4,328 grams__.
+:::
+
+```{code-blanks-response}
+In your own words, explain the difference between what `pnorm()` and `qnorm()` each calculate. When would you use one versus the other?
+```
+

@@ -1,0 +1,434 @@
+---
+title: "Module 2: Probability and Inference"
+description: "Fill-in-the-blank coding exercises for Module 2: Binomial Distributions"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+  progressive-reveal: true
+title-block-banner: "#7d94c9"
+title-block-banner-color: white
+---
+
+## Probability Distributions
+
+In this section we will practice calculating probabilities using different probability distributions. We will start with the binomial distribution then move on to the normal distribution.
+
+## Binomial Distribution
+
+We will begin with the binomial distribution.
+
+
+We are interested in studying hand hygiene practices at a local hospital. Suppose that the probability of a healthcare worker following proper hand hygiene practices is 75\%. We plan to observe 15 healthcare workers and will record if they comply with health hygiene recommendations or not.
+
+We are going to start by __empirically drawing from a binomial distribution__ to get a sense of what it looks like. Then we will use R functions to calculate probabilities directly from a binomial distribution. 
+
+
+```{code-blanks-instructions}
+Fill in the code below to randomly draw __one sample (n = 1)__ from a __binomial distribution__ with __15 healthcare workers__ and a __p = 0.75__ probability of compliance with hand hygiene recommendations.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 15
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 0.75
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+ 
+# sample one time from a binomial distribution (note, n = 1 indicates we are observing one set of 15 healthcare workers)
+rbinom(n = 1, size = 15, p = 0.75)
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# sample one time from a binomial distribution (note, n = 1 indicates we are observing one set of 15 healthcare workers)
+rbinom(n = 1, size = 15, p = 0.75)
+```
+:::
+
+If you completed the blanks above correctly, should see a number between 0 and 15. This number corresponds to the number out of 15 healthcare workers followed hand hygiene recommendations. 
+
+::: {.callout-note }
+Since this is a random process, __we will all see different numbers__.  
+
+
+In fact, <span style="color:#6a4a6a;">**try clicking the "Run Code" button above a few times**</span>. You should see different numbers appear when you run the code multiple times. This is what the code is supposed to do, since it is randomly generating values from this distribution. 
+
+For instructional purposes, it will be easier if we all get the same answers. We will show a strategy to address this next.
+:::
+
+
+
+## Setting Random Seeds
+
+To help us all get the same answers, we can add a line of code to do something called "setting the random seed." This is a bit technical, but what you should know is that if we all set the seed to the same number, we should get the same answers so our work will be more reproducible (don't worry, the results are still random--they're just a bit easier to keep track of!).
+
+```{code-blanks}
+# set random seed for reproducibility (I'm setting it to 123, but the number doesn't matter!)
+set.seed(123)
+# sample one time from a binomial distribution (note, n = 1 indicates we are observing one set of 15 healthcare workers)
+rbinom(n = 1, size = 15, p = 0.75)
+
+```
+
+Now we should all get the number 12.
+
+## Drawing Multiple Samples
+
+So far, we have only drawn from this binomial distribution a few times. To get a sense of the shape of the distribution, we will need to sample from it __many times__. To do this, we will change the argument `n` in the code above.
+
+
+```{code-blanks-instructions}
+Fill in the code below to draw from a binomial distribution multiple times. Start by __drawing 5 samples__ from the distribution, then __10__, then __30__. Hit "Run Code" each time to see how changing the argument `n` impacts the output.
+```
+
+
+```{code-blanks}
+#| blank:
+#|   target: 5
+#|   prefill: true
+#|   occurrence: 1
+#|   match: token
+
+# set random seed for reproducibility (I'm setting it to 123, but the number doesn't matter!)
+set.seed(123)
+# sample from a binomial distribution 
+rbinom(n = 5, size = 15, p = 0.75)
+
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# set random seed for reproducibility (I'm setting it to 123, but the number doesn't matter!)
+set.seed(123)
+# sample from a binomial distribution (5 times)
+rbinom(n = 5, size = 15, p = 0.75)
+```
+[[1] 12 10 12  9  9]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+```r
+# sample from a binomial distribution (10 times)
+rbinom(n = 10, size = 15, p = 0.75)
+```
+[[1] 12 10 12  9  9 14 11  9 11 12]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+```r
+# sample from a binomial distribution (30 times)
+rbinom(n = 30, size = 15, p = 0.75)
+```
+[[1] 12 10 12  9  9 14 11  9 11 12  8 12 11 11 13  9 12 14 12  8  9 10 11  7 11]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}<br>
+[[26] 10 11 11 12 13]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+:::
+
+## Visualizing a Binomial Distribution
+
+Now, let's draw from the distribution 10,000 times (imagine observing 10,000 different sets of 15 healthcare workers), save the results in a hand hygiene data frame called `hh` , and visualize the distribution.
+
+```{code-blanks-instructions}
+Fill in the code below to __draw 10,000 samples from the same binomial distribution__. The outcomes of these 10,000 draws will be saved in a data frame called `hh`, which can then be used to __plot the distribution__. 
+```
+
+
+```{code-blanks}
+#| blank:
+#|   target: 10000
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 15
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.75
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: compliant
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token  
+# set random seed for reproducibility (I'm setting it to 123, but the number doesn't matter!)
+set.seed(123)
+# sample from a binomial distribution 10,000 times
+hh = data.frame(compliant = rbinom(n = 10000, size = 15, p = 0.75))
+
+# plot the distribution
+hh %>%
+  ggplot(aes(x = compliant)) + 
+  geom_bar(fill = "blue") + 
+  theme_bw()
+```
+
+We can also make a table of the number of times each outcome was observed
+
+```{code-blanks}
+# table of outcome frequencies
+xtabs(~ compliant, data = hh)
+```
+
+```{code-blanks-response}
+Describe the distribution. Which values are the most common? What is the highest value observed? What is the lowest value observed?
+```
+
+## Empirical Probabilities from a Binomial Distribution
+
+Now let's calculate some (empirical) probabilities using our simulated distribution. These won't be the true theoretical probabilities, but they should be close!
+
+```{code-blanks-instructions}
+* How often do we see __all 15__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 15
+#|   prefill: true
+#|   occurrence: 2
+#|   match: token
+# probability all 15
+sum(hh$compliant == 15) / 10000
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability all 15
+sum(hh$compliant == 15) / 10000
+```
+[[1] 0.013]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+:::
+
+
+```{code-blanks-instructions}
+* How often do __fewer than 10__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target:  10
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+# probability fewer than 10
+sum(hh$compliant < 10) / 10000
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability fewer than 10
+sum(hh$compliant < 10) / 10000
+```
+[[1] 0.1436]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+:::
+
+
+```{code-blanks-instructions}
+* How often do __at least 12__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: >= 12
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# probability at least 12
+sum(hh$compliant >= 12) / 10000
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability at least 12
+sum(hh$compliant >= 12) / 10000
+
+# alternatively:
+# probability at least 12
+sum(hh$compliant > 11) / 10000
+```
+[[1] 0.4641]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+:::
+
+
+```{code-blanks-instructions}
+* How often do __exactly 2__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: == 2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# probability exactly 2
+sum(hh$compliant == 2) / 10000
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability exactly 2
+sum(hh$compliant == 2) / 10000
+sum(hh$compliant > 11) / 10000
+```
+[[1] 0]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Across 10,000 tries, __we never observe only 2 out of 15!__
+:::
+
+## Theoretical Probabilities
+
+We saw that only 1.3% of the simulated distribution has a value of 15, 14.36% had a value under 10, and 46.41% had a value of at least 12. Let's see what these probabilities should be based on the true, theoretical binomial distribution.
+
+```{code-blanks-instructions}
+* What is the true probability that __all 15__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 15
+#|   prefill: true
+#|   occurrence: 2
+#|   match: token
+# probability all 15
+dbinom(x = 15, size = 15, prob = 0.75)
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability all 15
+dbinom(x = 15, size = 15, prob = 0.75)
+```
+[[1] 0.01336346]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+:::
+
+```{code-blanks-instructions}
+* What is the true probability that __fewer than 10__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 9
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+# probability fewer than 10
+pbinom(q = 9, size = 15, prob = 0.75)
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability fewer than 10
+pbinom(q = 9, size = 15, prob = 0.75)
+```
+[[1] 0.1483681]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Recall that `pbinom(q)` gives P(X≤q), so if we want __strictly less than 10__ this is the same as __less than or equal to 9__
+:::
+
+```{code-blanks-instructions}
+* What is the true probability that __at least 12__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 11
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# probability at least 12
+pbinom(q = 11, size = 15, prob = 0.75, lower.tail = F)
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability at least 12
+pbinom(q = 11, size = 15, prob = 0.75, lower.tail = F)
+
+# alternatively:
+1 - pbinom(q = 11, size = 15, prob = 0.75)
+```
+[[1] 0.4612869]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+`lower.tail = F` means that we are calculating the upper tail; that is, P(X>q) or 1-P(X≤q). Again, since we want to include 12, __at least 12__ means __strictly larger than 11__.
+:::
+
+
+```{code-blanks-instructions}
+* What is the true probability that __exactly 2__ healthcare workers follow hand hygiene recommendations?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 2
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# probability exactly 2
+dbinom(x = 2, size = 15, prob = 0.75)
+```
+
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# probability exactly 2
+dbinom(x = 2, size = 15, prob = 0.75)
+```
+[[1] 8.800998e-07]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+It is __very unlikely__ to observe 2 out of 15 for this binomial distribution since p=0.75 is quite high. 
+:::
+
+Notice that the probabilities we have calculated from the theoretical binomial distribution are __very similar__ to the empirical probabilities we calculated from our simulated distribution. This is by design! 
+
+We simulated a large sample from a specific distribution to help us visualize what the distribution looks like; that is, to help us understand the relative frequencies of different outcome values from this particular distribution. 
+

@@ -1,61 +1,35 @@
 ---
 title: "R Coding Practice"
-listing:
-  - id: Module1
-    contents: "M1*.qmd"
-    type: table
-    categories: true
-    sort-ui: false
-    filter-ui: false
-  - id: Module2
-    contents: "M2*.qmd"
-    type: table
-    categories: true
-    sort-ui: false
-    filter-ui: false
-  - id: Module3
-    contents: "M3*.qmd"
-    type: table
-    categories: true
-    sort-ui: false
-    filter-ui: false
-  - id: Module4
-    contents: "M4*.qmd"
-    type: table
-    categories: true
-    sort-ui: false
-    filter-ui: false
-  - id: Module5
-    contents: "M5*.qmd"
-    type: table
-    categories: true
-    sort-ui: false
-    filter-ui: false
 page-layout: full
-title-block-banner: rainbow.jpg
+title-block-banner: "#9D629D"
 title-block-banner-color: "black"
+
 ---
 
 ## Module 1
 
-::: {#Module1}
-:::
+- [Data Wrangling](modules/module1/data_wrangling.qmd)
+- [Data Summarizaiton and Visualization](modules/module1/dataviz_summary.qmd)
+
 
 ## Module 2
 
-::: {#Module2}
-:::
+- Probability Distributions
+  - [Binomial Distribution](modules/module2/binomial.qmd)
+  - [Normal Distribution](modules/module2/normal.qmd)
+- [Statistical Inference](modules/module2/sampling_distributions.qmd)
 
 ## Module 3
 
-::: {#Module3}
-:::
+- One sample t-tests & Wilcoxon Signed Rank Tests
+- Two sample t-tests & Wilcoxon Rank Sum Tests
+- Paired t-tests
 
 ## Module 4
+- ANOVA 
+- SLR
 
-::: {#Module4}
-:::
 ## Module 5
 
-::: {#Module5}
-:::
+- Tests for one proportion
+- Chi-sqaured tests and Fisher's Exact test

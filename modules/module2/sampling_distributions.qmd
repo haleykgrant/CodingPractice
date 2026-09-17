@@ -1,0 +1,365 @@
+---
+title: "Module 2: Probability and Inference"
+description: "Fill-in-the-blank coding exercises for Module 2: Sampling Distributions and the Central Limit Theorem"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - set.seed(123)
+    - "pop = data.frame(los = rexp(n = 100000, rate = 1/4.5))"
+  progressive-reveal: true
+title-block-banner: "#7d94c9"
+title-block-banner-color: white
+---
+
+## Sampling Distributions
+
+Recall that if we have a population with some true underlying parameter (like a mean, $\mu$), we use a sample statistic (like a sample mean, $\bar{x}$) to estimate it. Because our sample is just one of many possible samples we could have drawn, our statistic will vary from sample to sample. The **sampling distribution** of a statistic describes what values that statistic would take on across all possible samples of a given size, $n$, drawn from the same population.
+
+In this section, we'll start from a simulated population, then repeatedly sample from it to see the sampling distribution of the mean take shape.
+
+Our running example: __length of hospital stay (LOS)__, in days, following a particular surgery. LOS tends to be __right-skewed__&mdash;most patients go home quickly, but a few stay much longer&mdash;so it's a nice example for testing whether the Central Limit Theorem (CLT) really works even when the underlying population isn't normal.
+
+### Simulating a Population
+
+To explore sampling distributions, we first need a population to sample from. We've simulated one for you below: __100,000 patients'__ length of stay, drawn from an exponential distribution with a __mean of 4.5 days__. The results are saved in a data frame called `pop`, with a column called `los`. (You don't need to worry about the code that generated it&mdash;just know that we now have a full population to sample from.)
+
+```{r}
+#| echo: false
+
+# set random seed for reproducibility
+set.seed(123)
+# simulate a population of length-of-stay values
+pop = data.frame(los = rexp(n = 100000, rate = 1/4.5))
+```
+
+```{code-blanks-instructions}
+Fill in the code below to plot a histogram of the population distribution, `pop$los`, to see its shape.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: los
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# plot the population distribution
+pop %>%
+  ggplot(aes(x = los)) +
+  geom_histogram(fill = "blue", bins = 40) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# plot the population distribution
+pop %>%
+  ggplot(aes(x = los)) +
+  geom_histogram(fill = "blue", bins = 40) +
+  theme_bw()
+```
+
+You should see a strongly __right-skewed__ distribution: a tall bar near 0, with a long tail stretching out to the right toward higher values. This is clearly __not__ a normal distribution.
+:::
+
+
+We can check the population's mean and standard deviation directly:
+
+```{code-blanks}
+# mean and sd of the population
+mean(pop$los)
+sd(pop$los)
+```
+
+```{code-blanks-response}
+What is the mean value of `los` in the population? What is the standard deviaiton?
+```
+
+### Drawing a Single Sample
+
+In practice, we don't get to see the whole population&mdash;we only get to observe **one sample**. Let's draw a single sample of patients and calculate the sample mean.
+
+```{code-blanks-instructions}
+Draw __one random sample of 30 patients__ (without replacement) from the population vector `pop$los`, and calculate the mean of that sample.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 30
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# set random seed for reproducibility
+set.seed(1)
+# draw one sample of size 30
+one_sample = sample(pop$los, size = 30, replace = FALSE)
+
+# calculate the sample mean
+mean(one_sample)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# set random seed for reproducibility
+set.seed(1)
+# draw one sample of size 30
+one_sample = sample(pop$los, size = 30, replace = FALSE)
+
+# calculate the sample mean
+mean(one_sample)
+```
+
+Your sample mean is a single point estimate of the true population mean (4.5). If you re-ran this code with a __different seed__, you'd get a __different sample__, and therefore a __different sample mean__. That sample-to-sample variability is exactly what the sampling distribution describes.
+:::
+
+### Building a Sampling Distribution
+
+To see the sampling distribution of the mean directly, we need to repeat the sampling process many times&mdash;drawing a sample, calculating its mean, and recording that mean&mdash;over and over. Let's do this for samples of size __n = 5__ first.
+
+```{code-blanks-instructions}
+Fill in the code below to repeat the sampling process __10,000 times__, each time drawing a sample of __size 5__ from the population and recording the sample mean.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 5
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# set random seed for reproducibility
+set.seed(2)
+# number of repeated samples to draw
+niter = 10000
+
+# create a place to store the sample means
+samp_means_5 = data.frame(mean_los = rep(NA, 10000))
+
+for(i in 1:niter){
+  # draw one sample of size 5
+  samp = sample(pop$los, size = 5, replace = FALSE)
+  # store the sample mean
+  samp_means_5$mean_los[i] = mean(samp)
+}
+
+# plot the sampling distribution
+samp_means_5 %>%
+  ggplot(aes(x = mean_los)) +
+  geom_histogram(fill = "orange", bins = 40) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The plotted distribution should still look __somewhat right-skewed__, though a bit less extreme than the population itself. With such a small sample size (n = 5), each sample mean is still heavily influenced by any large values that happen to get sampled.
+:::
+
+Now let's repeat the same process, but with a __much larger__ sample size, __n = 100__.
+
+```{code-blanks-instructions}
+Repeat the process above, but this time draw samples of __size 100__ instead of size 5.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 100
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# set random seed for reproducibility
+set.seed(2)
+# number of repeated samples to draw
+niter = 10000
+
+# create a place to store the sample means
+samp_means_100 = data.frame(mean_los = rep(NA, niter))
+
+for(i in 1:niter){
+  # draw one sample of size 100
+  samp = sample(pop$los, size = 100, replace = FALSE)
+  # store the sample mean
+  samp_means_100$mean_los[i] = mean(samp)
+}
+
+# plot the sampling distribution
+samp_means_100 %>%
+  ggplot(aes(x = mean_los)) +
+  geom_histogram(fill = "orange", bins = 40) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Even though the __population__ is strongly right-skewed, the sampling distribution of the mean for __n = 100__ should look approximately __symmetric and bell-shaped__&mdash;much closer to a normal distribution. This is the __Central Limit Theorem__ in action: as the sample size grows, the sampling distribution of the sample mean approaches a normal distribution, regardless of the shape of the underlying population (as long as $n$ is reasonably large).
+:::
+
+```{code-blanks-response}
+Compare the spread (width) of the two sampling distributions you just created (n = 5 vs. n = 100). Which one is more spread out? Does this match what you'd expect based on the sample sizes used?
+```
+
+### Standard Error
+
+The standard deviation of a sampling distribution has a special name: the __standard error (SE)__. The CLT tells us that if $X$ has population mean $\mu$ and standard deviation $\sigma$, then for a sufficiently large sample size $n$:
+
+$$\bar{X} \sim Normal\left(\mu, \ \dfrac{\sigma}{\sqrt{n}}\right)$$
+
+That is, the theoretical standard error is $\sigma / \sqrt{n}$.
+
+```{code-blanks-instructions}
+Calculate the __empirical__ standard error from your simulated sampling distribution for __n = 100__ (i.e., `sd()` of `samp_means_100$mean_los`). Then calculate the __theoretical__ standard error using the formula above, assuming the true population standard deviation is __4.5__ (recall: for the exponential distribution, sd = mean) and __n = 100__.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 4.5
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 100
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# empirical standard error (from our simulation)
+sd(samp_means_100$mean_los)
+
+# theoretical standard error
+4.5 / sqrt(100)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# theoretical standard error
+4.5 / sqrt(100)
+```
+[[1] 0.45]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Your empirical standard error (from `sd(samp_means_100$mean_los)`) should be __close to 0.45__, though it won't match exactly since it's based on a finite number of simulated samples. Notice that as $n$ increases, the standard error __decreases__&mdash;larger samples give us more precise (less variable) estimates of the population mean.
+:::
+
+## Applying the CLT to Calculate Probabilities
+
+Once we know (or can assume) that a sampling distribution is approximately normal, we can use everything we learned about the normal distribution to calculate probabilities about sample means&mdash;without needing to simulate anything!
+
+```{code-blanks-instructions}
+Suppose we plan to take a random sample of __100 patients__. Assuming the population mean LOS is __4.5 days__ with a standard deviation of __4.5 days__, use the CLT to find the probability that the __sample mean__ LOS is __greater than 5 days__. __Hint:__ first calculate the standard error, then use `pnorm()`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 5
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: 4.5
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 100
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# standard error for n = 100
+se = 4.5 / sqrt(100)
+
+# probability the sample mean exceeds 5 days
+pnorm(q = 5, mean = 4.5, sd = se, lower.tail = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# standard error for n = 100
+se = 4.5 / sqrt(100)
+
+# probability the sample mean exceeds 5 days
+pnorm(q = 5, mean = 4.5, sd = se, lower.tail = F)
+```
+[[1] 0.1332603]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+There is about a __13.3% chance__ that a random sample of 100 patients has a mean LOS greater than 5 days.
+:::
+
+```{code-blanks-instructions}
+Now repeat the same calculation, but assume we only sampled __30 patients__ instead of 100. Is the probability __higher, lower, or the same__ compared to before?
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 30
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 5
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: 4.5
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# standard error for n = 30
+se = 4.5 / sqrt(30)
+
+# probability the sample mean exceeds 5 days
+pnorm(q = 5, mean = 4.5, sd = se, lower.tail = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# standard error for n = 30
+se = 4.5 / sqrt(30)
+
+# probability the sample mean exceeds 5 days
+pnorm(q = 5, mean = 4.5, sd = se, lower.tail = F)
+```
+[[1] 0.2714012]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With a smaller sample size (n = 30), the standard error is __larger__, so sample means are __more variable__. This makes it __more likely__ (about 27.1% vs. 13.3%) to see a sample mean as far from 4.5 as 5 days, just by chance.
+:::
+
+```{code-blanks-response}
+We used the CLT to calculate these probabilities even though our population (length of stay) is __not__ normally distributed. Based on what you saw in the "Building a Sampling Distribution" section, explain why this is still valid for n = 100 but might be questionable for a much smaller sample size, like n = 5. What if I wanted to calculate the probability that one individual length of stay was above some value? Could I use the CLT then?
+```
+
+Notice that if the underlying population itself were normally distributed, we would __not__ need a large sample size for the CLT to apply&mdash;the sampling distribution of the mean would be exactly normal for __any__ sample size, even n = 2 or n = 3. The "large enough n" condition is only needed to overcome skewness or other non-normal features of the population.
