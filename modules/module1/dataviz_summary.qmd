@@ -34,10 +34,15 @@ cdc <- read_csv("https://haleykgrant.github.io/tutorial_data/data/cdc.samp.csv")
 cdc <- cdc %>%
   mutate(insured = factor(hlthplan, levels = c(0,1), labels = c("No","Yes")))
 
+# print the column names for reference
+names(cdc)
 ```
 
+The last line of code shows the names of the columns (the variable names) from the data, which will be helpful later.
 
 Now we are ready to start making some plots and calculating some summary statistics using our data! We will split the exercises by the number and the type of variables we are working with.
+
+
 
 ## One Categorical Variable
 

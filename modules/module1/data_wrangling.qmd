@@ -153,3 +153,6 @@ cdc <- cdc %>%
 head(cdc)
 ```
 :::
+
+
+That's all for now!

@@ -3,3 +3,5 @@ title: "About"
 ---
 
 This site contains extra coding examples to help students improve their R programming skills for introductory biostatistics courses.
+
+_This site is under construction. Exercises will be added over time._

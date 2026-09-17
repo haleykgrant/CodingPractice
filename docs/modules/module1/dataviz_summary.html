@@ -219,7 +219,10 @@ cdc &lt;- read_csv("https://haleykgrant.github.io/tutorial_data/data/cdc.samp.cs
 # update dataframe to add new `insured` column
 cdc &lt;- cdc %&gt;%
   mutate(insured = factor(hlthplan, levels = c(0,1), labels = c("No","Yes")))
-</code></pre>
+
+# print the column names for reference
+names(cdc)</code></pre>
+<p>The last line of code shows the names of the columns (the variable names) from the data, which will be helpful later.</p>
 <p>Now we are ready to start making some plots and calculating some summary statistics using our data! We will split the exercises by the number and the type of variables we are working with.</p>
 </section>
 <section id="one-categorical-variable" class="level2">
