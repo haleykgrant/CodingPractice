@@ -293,7 +293,7 @@ Solution
 <p>Fill in the code to update the <code>cdc</code> dataframe to <strong>add a new column</strong> called <code>insured</code> holding a <strong>factor variable</strong> that reads <code>"Yes"</code> if the individual has health insurance and <code>"No"</code> if they do not.</p>
 </div>
 <pre class="code-blanks"><code># update dataframe to add new `insured` column
-<input class="code-blank-input" data-answer="cdc" data-default="" value="" size="5"> &lt;- cdc |&gt;
+<input class="code-blank-input" data-answer="cdc" data-default="" value="" size="5"> &lt;- cdc %&gt;%
   mutate(insured = factor(<input class="code-blank-input" data-answer="hlthplan" data-default="" value="" size="10">, levels = c(0,1), labels = c(<input class="code-blank-input" data-answer="&quot;No&quot;" data-default="" value="" size="6">,<input class="code-blank-input" data-answer="&quot;Yes&quot;" data-default="" value="" size="7">)))
   
 # take a look to make sure it works
@@ -328,7 +328,7 @@ Solution
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># update dataframe to add new `insured` column</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>cdc <span class="ot">&lt;-</span> cdc <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>cdc <span class="ot">&lt;-</span> cdc <span class="sc">%&gt;%</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">insured =</span> <span class="fu">factor</span>(hlthplan, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span>,<span class="st">"Yes"</span>)))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># take a look to make sure it works</span></span>
