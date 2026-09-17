@@ -17,7 +17,8 @@ title-block-banner-color: "black"
 - Probability Distributions
   - [Binomial Distribution](modules/module2/binomial.qmd)
   - [Normal Distribution](modules/module2/normal.qmd)
-  - [Statistical Inference](modules/module2/sampling_distributions.qmd)
+- Statistical Inference
+  - [Sampling Distributions](modules/module2/sampling_distributions.qmd)
 
 ## Module 3
 
