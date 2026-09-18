@@ -25,7 +25,7 @@ title-block-banner-color: white
 
 Recall that if we have a population with some true underlying parameter (like a mean, $\mu$), we use a sample statistic (like a sample mean, $\bar{x}$) to estimate it. Because our sample is just one of many possible samples we could have drawn, our statistic will vary from sample to sample. The **sampling distribution** of a statistic describes what values that statistic would take on across all possible samples of a given size, $n$, drawn from the same population.
 
-In this section, we'll start from a simulated population, then repeatedly sample from it to see the sampling distribution of the mean take shape.
+In this section, we'll start from a simulated population, then repeatedly sample from it to see visualize the sampling distribution of the mean.
 
 Our running example: __length of hospital stay (LOS)__, in days, following a particular surgery. LOS tends to be __right-skewed__&mdash;most patients go home quickly, but a few stay much longer&mdash;so it's a nice example for testing whether the Central Limit Theorem (CLT) really works even when the underlying population isn't normal.
 

@@ -12,6 +12,9 @@ Practice statistical programming in R through short fill-in-the-blank exercises.
 <div class="module-card">
 
 ### Module 1
+
+![](images/1_data.svg){.module-image}
+
 **Working with Data**
 
 Learning how to manipulate, summarize, and visualize data.
@@ -27,6 +30,8 @@ Learning how to manipulate, summarize, and visualize data.
 
 
 ### Module 2
+![](images/2_bell_curve.svg){.module-image}
+
 **Probability & Statistical Inference**
 
 Explore probability distributions and sampling distributions using R.
@@ -40,6 +45,7 @@ Explore probability distributions and sampling distributions using R.
 <div class="module-card">
 
 ### Module 3
+![](images/3_boxplots.svg){.module-image}
 **Comparing Groups**
 
 Practice statistical tests for quantitative outcomes with 1-2 groups.
@@ -55,6 +61,8 @@ Practice statistical tests for quantitative outcomes with 1-2 groups.
 <div class="module-card">
 
 ### Module 4
+![](images/4_regression.svg){.module-image}
+
 **ANOVA & Regression**
 
 Practice statistical tests for quantitative outcomes with more than 2 groups or continuous predictors.
@@ -67,6 +75,7 @@ Practice statistical tests for quantitative outcomes with more than 2 groups or 
 <div class="module-card">
 
 ### Module 5
+![](images/5_mosaic.svg){.module-image}
 **Categorical Data**
 
 Practice hypothesis tests for categorical variables.
