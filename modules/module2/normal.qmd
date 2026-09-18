@@ -153,7 +153,7 @@ First, calculate the Z-score corresponding to a birth weight of 2,500 grams (usi
 #| blank:
 #|   target: 2500
 #|   prefill: false
-#|   occurrence: 1
+#|   occurrence: 2
 #|   match: token
 #| blank:
 #|   target: 3250
@@ -201,7 +201,7 @@ Suppose birth weights __above 4,000 grams__ are flagged as unusually high. Use `
 #| blank:
 #|   target: 4000
 #|   prefill: false
-#|   occurrence: 1
+#|   occurrence: 2
 #|   match: token
 #| blank:
 #|   target: 3250
@@ -245,23 +245,14 @@ Find the probability that a randomly selected birth weight falls __between 2,700
 #| blank:
 #|   target: 3800
 #|   prefill: false
-#|   occurrence: 1
+#|   occurrence: 2
 #|   match: token
 #| blank:
 #|   target: 2700
 #|   prefill: false
-#|   occurrence: 1
-#|   match: token
-#| blank:
-#|   target: 3250
-#|   prefill: false
 #|   occurrence: 2
 #|   match: token
-#| blank:
-#|   target: 550
-#|   prefill: false
-#|   occurrence: 2
-#|   match: token
+
 
 # probability of birth weight between 2700 and 3800 grams
 pnorm(q = 3800, mean = 3250, sd = 550) - pnorm(q = 2700, mean = 3250, sd = 550)

@@ -337,8 +337,8 @@ Solution
 <div class="code-blanks-instructions-box">
 <p>First, calculate the Z-score corresponding to a birth weight of 2,500 grams (using <span class="math inline">\(\mu = 3250\)</span> and <span class="math inline">\(\sigma = 550\)</span>). Then use <code>pnorm()</code> on that Z-score (using the <strong>default</strong> mean and sd, i.e.&nbsp;the standard normal) to confirm you get the <strong>same probability</strong> as above.</p>
 </div>
-<pre class="code-blanks"><code># calculate the Z-score for a birth weight of <input class="code-blank-input" data-answer="2500" data-default="" value="" size="6"> grams
-z = (2500 - <input class="code-blank-input" data-answer="3250" data-default="" value="" size="6">) / <input class="code-blank-input" data-answer="550" data-default="" value="" size="5">
+<pre class="code-blanks"><code># calculate the Z-score for a birth weight of 2500 grams
+z = (<input class="code-blank-input" data-answer="2500" data-default="" value="" size="6"> - <input class="code-blank-input" data-answer="3250" data-default="" value="" size="6">) / <input class="code-blank-input" data-answer="550" data-default="" value="" size="5">
 
 # probability using the standard normal distribution
 pnorm(z)</code></pre>
@@ -371,8 +371,8 @@ Solution
 <div class="code-blanks-instructions-box">
 <p>Suppose birth weights <strong>above 4,000 grams</strong> are flagged as unusually high. Use <code>pnorm()</code> with <code>lower.tail = FALSE</code> to find the probability that a randomly selected newborn’s weight exceeds 4,000 grams.</p>
 </div>
-<pre class="code-blanks"><code># probability of birth weight greater than <input class="code-blank-input" data-answer="4000" data-default="" value="" size="6"> grams
-pnorm(q = 4000, mean = <input class="code-blank-input" data-answer="3250" data-default="" value="" size="6">, sd = <input class="code-blank-input" data-answer="550" data-default="" value="" size="5">, lower.tail = <input class="code-blank-input" data-answer="F" data-default="" value="" size="4">)</code></pre>
+<pre class="code-blanks"><code># probability of birth weight greater than 4000 grams
+pnorm(q = <input class="code-blank-input" data-answer="4000" data-default="" value="" size="6">, mean = <input class="code-blank-input" data-answer="3250" data-default="" value="" size="6">, sd = <input class="code-blank-input" data-answer="550" data-default="" value="" size="5">, lower.tail = <input class="code-blank-input" data-answer="F" data-default="" value="" size="4">)</code></pre>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -398,8 +398,9 @@ Solution
 <div class="code-blanks-instructions-box">
 <p>Find the probability that a randomly selected birth weight falls <strong>between 2,700 and 3,800 grams</strong>.</p>
 </div>
-<pre class="code-blanks"><code># probability of birth weight between <input class="code-blank-input" data-answer="2700" data-default="" value="" size="6"> and <input class="code-blank-input" data-answer="3800" data-default="" value="" size="6"> grams
-pnorm(q = 3800, mean = 3250, sd = 550) - pnorm(q = 2700, mean = <input class="code-blank-input" data-answer="3250" data-default="" value="" size="6">, sd = <input class="code-blank-input" data-answer="550" data-default="" value="" size="5">)</code></pre>
+<pre class="code-blanks"><code>
+# probability of birth weight between 2700 and 3800 grams
+pnorm(q = <input class="code-blank-input" data-answer="3800" data-default="" value="" size="6">, mean = 3250, sd = 550) - pnorm(q = <input class="code-blank-input" data-answer="2700" data-default="" value="" size="6">, mean = 3250, sd = 550)</code></pre>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
