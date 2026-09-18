@@ -228,7 +228,7 @@
     "href": "index.html",
     "title": "R Coding Practice",
     "section": "",
-    "text": "Data Wrangling\nData Summarizaiton and Visualization"
+    "text": "Practice statistical programming in R through short fill-in-the-blank exercises.\n\n\nModule 1\nWorking with Data\nLearning how to manipulate, summarize, and visualize data.\nData Wrangling →\nData Summarization & Visualization →\n\n\nModule 2\nProbability & Statistical Inference\nExplore probability distributions and sampling distributions using R.\n\nBinomial Distribution →\nNormal Distribution →\nSampling Distributions →\n\n\n\nModule 3\nComparing Groups\nPractice statistical tests for quantitative outcomes with 1-2 groups.\n\nOne-sample t-tests\nWilcoxon signed-rank tests\nTwo-sample t-tests\nWilcoxon rank-sum tests\nPaired t-tests\n\n\n\nModule 4\nANOVA & Regression\nPractice statistical tests for quantitative outcomes with more than 2 groups or continuous predictors.\n\nANOVA\nSimple linear regression\n\n\n\nModule 5\nCategorical Data\nPractice hypothesis tests for categorical variables.\n\nTests for one proportion\nChi-squared tests\nFisher’s exact test"
   },
   {
     "objectID": "index.html#module-1",

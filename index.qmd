@@ -3,34 +3,78 @@ title: "R Coding Practice"
 page-layout: full
 title-block-banner: "#9D629D"
 title-block-banner-color: "black"
-
 ---
 
-## Module 1
+Practice statistical programming in R through short fill-in-the-blank exercises.
 
-- [Data Wrangling](modules/module1/data_wrangling.qmd)
-- [Data Summarizaiton and Visualization](modules/module1/dataviz_summary.qmd)
+<div class="module-grid">
+
+<div class="module-card">
+
+### Module 1
+**Working with Data**
+
+Learning how to manipulate, summarize, and visualize data.
+
+[**Data Wrangling →**](modules/module1/data_wrangling.qmd)
+
+[**Data Summarization & Visualization →**](modules/module1/dataviz_summary.qmd)
+
+</div>
+
+<div class="module-card">
 
 
-## Module 2
 
-- Probability Distributions
-  - [Binomial Distribution](modules/module2/binomial.qmd)
-  - [Normal Distribution](modules/module2/normal.qmd)
-- Statistical Inference
-  - [Sampling Distributions](modules/module2/sampling_distributions.qmd)
+### Module 2
+**Probability & Statistical Inference**
 
-## Module 3
+Explore probability distributions and sampling distributions using R.
 
-- One sample t-tests & Wilcoxon Signed Rank Tests
-- Two sample t-tests & Wilcoxon Rank Sum Tests
+- [Binomial Distribution →](modules/module2/binomial.qmd)
+- [Normal Distribution →](modules/module2/normal.qmd)
+- [Sampling Distributions →](modules/module2/sampling_distributions.qmd)
+
+</div>
+
+<div class="module-card">
+
+### Module 3
+**Comparing Groups**
+
+Practice statistical tests for quantitative outcomes with 1-2 groups.
+
+- One-sample t-tests
+- Wilcoxon signed-rank tests
+- Two-sample t-tests
+- Wilcoxon rank-sum tests
 - Paired t-tests
 
-## Module 4
-- ANOVA 
-- SLR
+</div>
 
-## Module 5
+<div class="module-card">
+
+### Module 4
+**ANOVA & Regression**
+
+Practice statistical tests for quantitative outcomes with more than 2 groups or continuous predictors.
+
+- ANOVA
+- Simple linear regression
+
+</div>
+
+<div class="module-card">
+
+### Module 5
+**Categorical Data**
+
+Practice hypothesis tests for categorical variables.
 
 - Tests for one proportion
-- Chi-sqaured tests and Fisher's Exact test
+- Chi-squared tests
+- Fisher's exact test
+
+</div>
+
+</div>
