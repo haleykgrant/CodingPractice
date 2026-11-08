@@ -50,11 +50,12 @@ Explore probability distributions and sampling distributions using R.
 
 Practice statistical tests for quantitative outcomes with 1-2 groups.
 
-- One-sample t-tests
-- Wilcoxon signed-rank tests
-- Two-sample t-tests
-- Wilcoxon rank-sum tests
-- Paired t-tests
+- [One-Sample t-Tests→](modules/module3/one_sample_t.qmd)
+- [Wilcoxon Signed-Rank Tests→](modules/module3/wilcoxon_signed_rank.qmd)
+- [Paired t-Tests→](modules/module3/paired_t.qmd)
+- [Two-Sample t-Tests→](modules/module3/two_sample_t.qmd)
+- [Wilcoxon Rank-Sum Tests→](modules/module3/wilcoxon_rank_sum.qmd)
+
 
 </div>
 
@@ -67,8 +68,8 @@ Practice statistical tests for quantitative outcomes with 1-2 groups.
 
 Practice statistical tests for quantitative outcomes with more than 2 groups or continuous predictors.
 
-- ANOVA
-- Simple linear regression
+- [ANOVA & Kruskal-Wallis→](modules/module4/anova_kruskal_wallis.qmd)
+- [Simple Linear Regression→](modules/module4/linear_regression.qmd)
 
 </div>
 
@@ -80,9 +81,10 @@ Practice statistical tests for quantitative outcomes with more than 2 groups or 
 
 Practice hypothesis tests for categorical variables.
 
-- Tests for one proportion
-- Chi-squared tests
-- Fisher's exact test
+- [Tests for One Proportion→](modules/module5/one_proportion.qmd)
+- [McNemar's Test (Paired)→](modules/module5/mcnemars.qmd)
+- [Chi-squared Tests→](modules/module5/chi_squared.qmd)
+- [Fisher's Exact Test→](modules/module5/fishers_exact.qmd)
 
 </div>
 

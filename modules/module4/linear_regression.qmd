@@ -1,0 +1,531 @@
+---
+title: "Module 4: Simple Linear Regression"
+description: "Fill-in-the-blank coding exercises for Module 4: Simple Linear Regression"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - set.seed(2024)
+    - sodium = runif(100, 1500, 6000)
+    - sbp = 85 + 0.015 * sodium + rnorm(100, sd = 9.2)
+    - sodium_bp = data.frame(sodium = sodium, sbp = sbp)
+  progressive-reveal: true
+title-block-banner: "#c97d4f"
+title-block-banner-color: white
+---
+
+## Simple Linear Regression
+
+**Simple linear regression** models the relationship between a continuous outcome ($Y$) and a single continuous predictor ($X$) as a straight line:
+
+$$Y = \beta_0 + \beta_1 X + \epsilon$$
+
+**Conditions (LINE):**
+
+- **L**inearity: the true relationship between $X$ and $Y$ is linear
+- **I**ndependence: observations are independent of one another
+- **N**ormality: residuals are approximately normally distributed
+- **E**qual variance: the spread of residuals is roughly constant across all values of $X$ (homoscedasticity)
+
+**Motivating example:** Does daily sodium intake predict systolic blood pressure? We have data on __100 patients__: their self-reported daily sodium intake (`sodium`, in mg/day) and their systolic blood pressure (`sbp`, in mmHg), stored in `sodium_bp`.
+
+### Visualizing the Relationship
+
+```{code-blanks-instructions}
+Fill in the code below to create a scatterplot of `sbp` (y-axis) vs. `sodium` (x-axis).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sodium
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: sbp
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# scatterplot of SBP vs. sodium intake
+sodium_bp %>%
+  ggplot(aes(x = sodium, y = sbp)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Sodium Intake (mg/day)", y = "Systolic Blood Pressure (mmHg)")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# scatterplot of SBP vs. sodium intake
+sodium_bp %>%
+  ggplot(aes(x = sodium, y = sbp)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Sodium Intake (mg/day)", y = "Systolic Blood Pressure (mmHg)")
+```
+
+You should see a clear __positive, linear__ trend&mdash;higher sodium intake tends to go with higher systolic blood pressure.
+:::
+
+### Fitting the Model
+
+```{code-blanks-instructions}
+Fill in the code below to fit a linear model predicting `sbp` from `sodium`, and print the summary.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: sodium
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# fit the model
+model_lm = lm(sbp ~ sodium, data = sodium_bp)
+summary(model_lm)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# fit the model
+model_lm = lm(sbp ~ sodium, data = sodium_bp)
+summary(model_lm)
+```
+
+You should see a positive, highly significant slope. We'll extract these exact numbers directly from `model_lm` throughout the rest of this file, rather than assuming hypothetical values.
+:::
+
+### Interpreting Coefficients
+
+Let's pull the coefficient estimates directly out of our fitted model using `coef()`, rather than assuming hypothetical values.
+
+```{code-blanks-instructions}
+Fill in the code below to extract the intercept and slope from `model_lm`, then use them to predict average SBP for a patient with a sodium intake of __4000 mg/day__.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 4000
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# coefficient estimates, extracted from the fitted model
+intercept = coef(model_lm)[1]
+slope = coef(model_lm)[2]
+
+# predicted SBP for sodium = 4000
+yhat = intercept + slope * 4000
+yhat
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# coefficient estimates, extracted from the fitted model
+intercept = coef(model_lm)[1]
+slope = coef(model_lm)[2]
+
+# predicted SBP for sodium = 4000
+yhat = intercept + slope * 4000
+yhat
+```
+
+Since `sodium` and `sbp` were simulated with a true intercept around 85 and a true slope around 0.015, your predicted value should come out to 144.7917.
+:::
+
+```{code-blanks-response}
+Interpret the slope you extracted above in the context of this problem. What does it mean for every additional 1000 mg/day of sodium intake?
+```
+
+### Inference for the Slope
+
+Is the relationship between sodium and SBP statistically significant? We can test $H_0: \beta_1 = 0$ (no linear relationship) vs. $H_A: \beta_1 \ne 0$, and construct a confidence interval for $\beta_1$.
+
+```{code-blanks-instructions}
+Fill in the code below to extract the slope's standard error and degrees of freedom from the model, then use them to calculate a 95% confidence interval for the slope.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 0.025
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.975
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: df_resid
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# slope standard error and degrees of freedom, extracted from the model
+slope_se = summary(model_lm)$coefficients["sodium", "Std. Error"]
+df_resid = model_lm$df.residual
+
+# 95% confidence interval for the slope
+slope + qt(c(0.025, 0.975), df = df_resid) * slope_se
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# slope standard error and degrees of freedom, extracted from the model
+slope_se = summary(model_lm)$coefficients["sodium", "Std. Error"]
+df_resid = model_lm$df.residual
+
+# 95% confidence interval for the slope
+slope + qt(c(0.025, 0.975), df = df_resid) * slope_se
+```
+
+This interval should sit entirely __above 0__, giving evidence of a significant positive relationship between sodium intake and SBP&mdash;consistent with the small p-value you saw in `summary(model_lm)` earlier.
+:::
+
+### Using `confint()`
+
+```{code-blanks-instructions}
+Fill in the code below to get confidence intervals for both coefficients directly from the fitted model, using the built-in `confint()` function.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# confidence intervals for the coefficients
+confint(model_lm)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# confidence intervals for the coefficients
+confint(model_lm)
+```
+
+This should give a confidence interval for the `sodium` coefficient similar in spirit to our hand-calculated interval above (though the exact numbers will differ slightly, since this model was fit to simulated data).
+:::
+
+```{code-blanks-response}
+Try running `confint(model_lm, level = .99)` instead of the default 95% level. Would you expect a 99% confidence interval to be wider or narrower than the 95% interval? Check your intuition against the output.
+```
+
+## Predictions: Confidence Intervals vs. Prediction Intervals
+
+When predicting for a new value of $X$, there are two different kinds of intervals we might want:
+
+- A **confidence interval** for the *average* $Y$ at a given $X$ (how precisely do we know the mean?)
+- A **prediction interval** for an *individual* new observation at a given $X$ (how much does any one person vary around that mean?)
+
+Prediction intervals are always __wider__, since they account for both our uncertainty about the mean *and* the natural variability of individual observations.
+
+Rather than assuming given values, let's calculate everything we need ($\bar{x}$, $S_{xx}$, and the residual standard error) directly from our data and model.
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the mean and sum of squared deviations of `sodium`, pull the residual standard error from `model_lm`, then use these to calculate the standard error for the *mean* response (confidence interval) and the standard error for an *individual* prediction (prediction interval), both at `sodium = 4000`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sodium_bp$sodium
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: sodium_bp$sodium
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 4000
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# mean and sum of squared deviations of sodium, calculated from the data
+xbar = mean(sodium_bp$sodium)
+Sxx = sum((sodium_bp$sodium - xbar)^2)
+
+# residual standard error and sample size, extracted from the model
+resid_se = summary(model_lm)$sigma
+n = nrow(sodium_bp)
+x0 = 4000
+
+# "leverage" term shared by both formulas
+lev = 1 / n + (x0 - xbar)^2 / Sxx
+
+# SE for the mean response (confidence interval)
+se_mean = resid_se * sqrt(lev)
+
+# SE for an individual prediction (prediction interval)
+se_pred = resid_se * sqrt(1 + lev)
+
+se_mean
+se_pred
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# mean and sum of squared deviations of sodium, calculated from the data
+xbar = mean(sodium_bp$sodium)
+Sxx = sum((sodium_bp$sodium - xbar)^2)
+
+# residual standard error and sample size, extracted from the model
+resid_se = summary(model_lm)$sigma
+n = nrow(sodium_bp)
+x0 = 4000
+
+# "leverage" term shared by both formulas
+lev = 1 / n + (x0 - xbar)^2 / Sxx
+
+# SE for the mean response (confidence interval)
+se_mean = resid_se * sqrt(lev)
+
+# SE for an individual prediction (prediction interval)
+se_pred = resid_se * sqrt(1 + lev)
+
+se_mean
+se_pred
+```
+
+Notice `se_pred` is __larger__ than `se_mean`, as expected&mdash;predicting for one new individual is always less precise than estimating the average.
+:::
+
+```{code-blanks-instructions}
+Using these standard errors, fill in the code below to construct the 95% confidence interval and 95% prediction interval for `sodium = 4000` (recall `yhat`, the predicted value, from earlier).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: yhat
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: yhat
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: df_resid
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: df_resid
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# 95% confidence interval for the mean response
+yhat + qt(c(0.025, 0.975), df = df_resid) * se_mean
+
+# 95% prediction interval for an individual
+yhat + qt(c(0.025, 0.975), df = df_resid) * se_pred
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# 95% confidence interval for the mean response
+yhat + qt(c(0.025, 0.975), df = df_resid) * se_mean
+
+# 95% prediction interval for an individual
+yhat + qt(c(0.025, 0.975), df = df_resid) * se_pred
+```
+
+As expected, the prediction interval should come out __much wider__ than the confidence interval.
+:::
+
+### Using `predict()`
+
+```{code-blanks-instructions}
+Fill in the code below to get the same two intervals directly using `predict()`, for a new patient with `sodium = 4000`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 4000
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "confidence"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "prediction"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# new data point
+new_dat = data.frame(sodium = 4000)
+
+# confidence interval
+predict(model_lm, newdata = new_dat, interval = "confidence")
+
+# prediction interval
+predict(model_lm, newdata = new_dat, interval = "prediction")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# new data point
+new_dat = data.frame(sodium = 4000)
+
+# confidence interval
+predict(model_lm, newdata = new_dat, interval = "confidence")
+
+# prediction interval
+predict(model_lm, newdata = new_dat, interval = "prediction")
+```
+
+Since our hand calculation above used this same model and data, these should match almost exactly.
+:::
+
+```{code-blanks-response}
+Would you be more comfortable using the prediction interval or the confidence interval to counsel an *individual* patient about their likely blood pressure? Which one would you use to describe the *average* blood pressure for a population with a given sodium intake?
+```
+
+## R-Squared
+
+```{code-blanks-instructions}
+Fill in the code below to extract $R^2$ directly from the model summary.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# R-squared
+summary(model_lm)$r.squared
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# R-squared
+summary(model_lm)$r.squared
+```
+[[1] 0.8315005]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+
+Since `sodium` and `sbp` were simulated with a fairly strong linear relationship and moderate noise, you should see a fairly high $R^2$ of about 0.83.
+:::
+
+```{code-blanks-response}
+In your own words, what does $R^2$ tell us about the relationship between sodium intake and SBP? (Hint: think about the proportion of variability in one variable explained by the other.)
+```
+
+## Checking Model Conditions
+
+```{code-blanks-instructions}
+Fill in the code below to create a residuals-vs-fitted-values plot and a QQ plot of the residuals, to check the equal variance and normality conditions.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: model_lm
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+par(mfrow = c(1, 2))
+# residuals vs. fitted values
+plot(model_lm, which = 1)
+
+# QQ plot of residuals
+plot(model_lm, which = 2)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# residuals vs. fitted values
+plot(model_lm, which = 1)
+
+# QQ plot of residuals
+plot(model_lm, which = 2)
+```
+
+For the __equal variance__ condition, we're looking for residuals scattered randomly around 0 with no obvious funnel or curved pattern as the fitted values increase. For the __normality__ condition, we're looking for the QQ plot points to fall close to the diagonal reference line.
+:::
+
+```{code-blanks-response}
+Why do we check the normality condition using the *residuals* from the model, rather than just looking at the marginal distribution of `sbp` by itself?
+```

@@ -64,3 +64,11 @@
 .module-card ul {
   margin-bottom: 0;
 }
+
+.module-image {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}

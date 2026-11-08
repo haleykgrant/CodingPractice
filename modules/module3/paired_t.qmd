@@ -1,0 +1,453 @@
+---
+title: "Module 3: Inference for Numerical Outcomes, Part III"
+description: "Fill-in-the-blank coding exercises for Module 3: Paired t-Tests"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - set.seed(999)
+    - baseline_A = rnorm(100, 142, 8)
+    - followup_A = baseline_A - 10 + rnorm(100, 0, 12)
+    - baseline_P = rnorm(100, 141, 8)
+    - followup_P = baseline_P - 3 + rnorm(100, 0, 16)
+    - htn_trial = data.frame(group_num = c(rep(1, 100), rep(2, 100)), sbp_baseline = c(baseline_A, baseline_P), sbp_followup = c(followup_A, followup_P))
+    - htn_trial = htn_trial %>% mutate(sbp_change = sbp_followup - sbp_baseline)
+    - htn_trial = htn_trial %>% mutate(group = factor(group_num, levels = c(1, 2), labels = c(\"Drug A\", \"Placebo\")))
+  progressive-reveal: true
+title-block-banner: "#2e8b78"
+title-block-banner-color: white
+---
+
+## Paired t-tests
+
+A **paired t-test** is used when two measurements are taken on the *same* subjects (e.g., before and after treatment), rather than on two independent groups. Instead of comparing two separate samples, we compute the **difference** for each subject and run a one-sample t-test on those differences, testing whether the average difference is 0.
+
+**Conditions:**
+
+- Random sample of pairs/subjects
+- Independent pairs (the differences themselves are independent across subjects)
+- $n > 30$, __or__ the differences follow a normal distribution in the population
+
+$$H_0: \mu_d = 0 \qquad \text{vs.} \qquad H_A: \mu_d \ne 0 \ \ (\text{or} \ <, \ >)$$
+
+where $\mu_d$ is the population mean of the paired differences.
+
+In our hypertension trial, each patient has both a baseline and a follow-up SBP measurement&mdash;the same patient, measured twice. That makes `sbp_change` (follow-up minus baseline) a natural candidate for a paired analysis: __did SBP change significantly from baseline to follow-up, within each treatment group?__
+
+### Visualizing Paired Data
+
+```{code-blanks-instructions}
+Fill in the code below to create a boxplot of `sbp_change`, faceted by `group`, with a horizontal reference line at 0 (no change).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 0
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# boxplot of change in SBP, faceted by group
+htn_trial %>%
+  ggplot(aes(y = sbp_change)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, linetype = 2, color = "red") +
+  facet_wrap(~ group) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# boxplot of change in SBP, faceted by group
+htn_trial %>%
+  ggplot(aes(y = sbp_change)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, linetype = 2, color = "red") +
+  facet_wrap(~ group) +
+  theme_bw()
+```
+
+The Drug A group's box should sit clearly __below__ the dashed zero line (a decrease), while the Placebo group's box should be closer to (but likely still somewhat below) zero.
+:::
+
+### Splitting the Data by Group
+
+```{code-blanks-instructions}
+Fill in the code below to create two separate data frames: `data_a` (Drug A only) and `data_p` (Placebo only).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: "Drug A"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "Placebo"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# split into Drug A and Placebo data frames
+data_a = htn_trial %>% filter(group == "Drug A")
+data_p = htn_trial %>% filter(group == "Placebo")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# split into Drug A and Placebo data frames
+data_a = htn_trial %>% filter(group == "Drug A")
+data_p = htn_trial %>% filter(group == "Placebo")
+```
+
+Now we have a separate data frame for each group, which will make the rest of our code simpler.
+:::
+
+### Drug A: Test by Hand
+
+We will now calculate the test statistic for the Drug A group:
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the test statistic for a paired t-test on the Drug A group's change scores.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: diff_a
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: sd_a
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: n_a
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+
+# Drug A summary statistics
+diff_a = mean(data_a$sbp_change)
+sd_a = sd(data_a$sbp_change)
+n_a = nrow(data_a)
+
+# print values
+diff_a ; sd_a ; n_a
+
+# test statistic
+t_a = diff_a / (sd_a / sqrt(n_a))
+t_a
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# Drug A summary statistics
+diff_a = mean(data_a$sbp_change)
+sd_a = sd(data_a$sbp_change)
+n_a = nrow(data_a)
+
+# print values
+diff_a ; sd_a ; n_a
+
+# test statistic
+t_a = diff_a / (sd_a / sqrt(n_a))
+t_a
+```
+[[1] -10.0667]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+This is an __extremely large__ test statistic in magnitude, suggesting very strong evidence that SBP decreased from baseline to follow-up in the Drug A group.
+:::
+
+```{code-blanks-instructions}
+Now calculate the two-sided p-value and a 95% confidence interval for the mean change.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: n_a - 1
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.025
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.975
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: n_a - 1
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# two-sided p-value
+2 * pt(abs(t_a), df = n_a - 1, lower.tail = F)
+
+# 95% confidence interval
+diff_a + qt(c(0.025, 0.975), df = n_a - 1) * (sd_a / sqrt(n_a))
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# two-sided p-value
+2 * pt(abs(t_a), df = n_a - 1, lower.tail = F)
+```
+[[1] 7.825647e-17]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+``` r
+# 95% confidence interval
+diff_a + qt(c(0.025, 0.975), df = n_a - 1) * (sd_a / sqrt(n_a))
+```
+[[1] -12.950227  -8.685646]]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+The p-value very small, and the 95% CI (-12.95, -8.69) is entirely below 0&mdash;strong evidence of a real decrease in SBP for the Drug A group.
+:::
+
+### Drug A: Test with `t.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run a paired t-test using `t.test()`. There are two equivalent ways to do this: running a one-sample test directly on the `sbp_change` column, or passing the original `sbp_followup` and `sbp_baseline` columns with `paired = T`. Try the second approach here.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp_followup
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: sbp_baseline
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: T
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# paired t-test (Drug A)
+t.test(x = data_a$sbp_followup, y = data_a$sbp_baseline, paired = T)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# paired t-test (Drug A)
+t.test(x = data_a$sbp_followup, y = data_a$sbp_baseline, paired = T)
+```
+
+This should give (approximately) the same test statistic, p-value, and conclusion as our hand calculation above. Try also running `t.test(data_a$sbp_change)` as a one-sample test&mdash;you should get identical results, since a paired t-test *is* just a one-sample t-test on the differences.
+:::
+
+### Placebo: Test by Hand
+
+Now we will move on to the Placebo group:
+
+```{code-blanks-instructions}
+Repeat the hand calculation above, but for the Placebo group's summary statistics.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: diff_p
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: sd_p
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: n_p
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+
+# Placebo group summary statistics
+diff_p = mean(data_p$sbp_change)
+sd_p = sd(data_p$sbp_change)
+n_p = nrow(data_p)
+
+# print values
+diff_p ; sd_p ; n_p
+
+# test statistic
+t_p = diff_p / (sd_p / sqrt(n_p))
+t_p
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# Placebo group summary statistics
+diff_p = mean(data_p$sbp_change)
+sd_p = sd(data_p$sbp_change)
+n_p = nrow(data_p)
+
+# print values
+diff_p ; sd_p ; n_p
+
+# test statistic
+t_p = diff_p / (sd_p / sqrt(n_p))
+t_p
+```
+[[1] -1.837283]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+This test statistic is quite a bit smaller in magnitude than our Drug A test statistic.
+:::
+
+```{code-blanks-response}
+Even though the Placebo group received no active treatment, we still found a statistically significant decrease in SBP. Does this mean the placebo "worked"? What are some other explanations for this result?
+```
+
+### What If We Didn't Pair?
+
+It's important to use a paired test when data are paired! Let's see what happens if we (incorrectly) run an unpaired (independent samples) t-test on the same baseline and follow-up values for the Drug A group.
+
+```{code-blanks-instructions}
+Fill in the code below to run the __incorrect__, unpaired version of the test on the Drug A group's baseline and follow-up values (`paired = F`), for comparison.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp_followup
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: sbp_baseline
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# INCORRECT: unpaired test on the same (paired) data
+t.test(x = data_a$sbp_followup, y = data_a$sbp_baseline, paired = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# INCORRECT: unpaired test on the same (paired) data
+t.test(x = data_a$sbp_followup, y = data_a$sbp_baseline, paired = F)
+```
+
+The test statistic here is __smaller in magnitude__ than our paired version, even though we're using the exact same data! That's because the unpaired test ignores the fact that baseline and follow-up measurements come from the *same* patients, and so it fails to account for (and remove) the variability between patients&mdash;variability that the paired test cancels out by looking at within-patient differences.
+:::
+
+```{code-blanks-response}
+Based on what you just saw, why does using the wrong (unpaired) test when data are actually paired tend to make it *harder* to detect a real effect, rather than easier?
+```
+
+## Power and Sample Size for Paired t-tests
+
+Power and sample size calculations for a paired t-test work exactly like the one-sample case, using the standard deviation of the *differences*.
+
+```{code-blanks-instructions}
+Suppose we want to detect a mean difference (`delta`) of __2 mmHg__, assuming a standard deviation of the differences of __10__, with a significance level of __0.05__ and __80% power__, using a __one-sided__ test. Fill in the code below to find the required sample size.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 10
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.05
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.8
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "one.sample"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "one.sided"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# required sample size for 80% power
+power.t.test(delta = 2, 
+             sd = 10, 
+             sig.level = 0.05, 
+             power = 0.8,
+             type = "one.sample", 
+             alternative = "one.sided")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# required sample size for 80% power
+power.t.test(delta = 2, 
+             sd = 10, 
+             sig.level = 0.05, 
+             power = 0.8,
+             type = "one.sample", 
+             alternative = "one.sided")
+```
+
+[n = 155.9257]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+We'd need about __156 patients__ to reliably detect a mean difference of 2 mmHg given this much variability in the differences.
+:::
+
+```{code-blanks-response}
+Our actual Drug A group only has n = 100 patients. Using `power.t.test()` with `n = 100` instead of solving for sample size, what power do we actually have to detect a 2 mmHg difference? Is it above or below 80%? (You should get something close to 63%.)
+```

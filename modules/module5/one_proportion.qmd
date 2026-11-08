@@ -1,0 +1,339 @@
+---
+title: "Module 5: Categorical Data, Part I"
+description: "Fill-in-the-blank coding exercises for Module 5: Tests for One Proportion"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+    - binom
+  setup:
+    - library(tidyverse)
+    - library(binom)
+  progressive-reveal: true
+title-block-banner: "#7d4f9c"
+title-block-banner-color: white
+---
+
+## Tests for a Single Proportion
+
+A **test for one proportion** asks whether a population proportion, $p$, differs from some hypothesized value, $p_0$.
+
+$$H_0: p = p_0 \qquad \text{vs.} \qquad H_A: p \ne p_0 \ \ (\text{or} \ <, \ >)$$
+
+**Conditions for the z-test:** $n p_0 \ge 5$ __and__ $n(1-p_0) \ge 5$. When this condition fails (usually because $p_0$ is very small or very close to 1, or $n$ is small), we use an __exact__ test instead.
+
+**Motivating example:** A clinic wants to check how well their flu vaccine is performing this season. Historically, around __8%__ of __unvaccinated__ adults get the flu each season. Out of __150 vaccinated patients__ tracked this season, __9__ developed the flu. Does the vaccinated group's flu rate differ from the 8% historical (unvaccinated) benchmark?
+
+### Checking Conditions
+
+```{code-blanks-instructions}
+Fill in the code below to check whether the conditions for a z-test are satisfied, using $n = 150$ and $p_0 = 0.08$.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 150
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 0.08
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# checking conditions for the z-test
+150 * 0.08
+150 * (1 - 0.08)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# checking conditions for the z-test
+150 * 0.08
+150 * (1 - 0.08)
+```
+[[1] 12]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+[[1] 138]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Both values are well above 5, so we can proceed with the z-test.
+:::
+
+### Z-test Using `prop.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run a two-sided z-test for one proportion, testing whether the true infection rate differs from 0.08. We'll use `correct = F` to turn off the continuity correction, so our results line up more closely with the by-hand calculations below.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 9
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 150
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.08
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# z-test for one proportion
+prop.test(x = 9, n = 150, p = 0.08, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# z-test for one proportion
+prop.test(x = 9, n = 150, p = 0.08, correct = F)
+```
+[[1] p-value = 0.3666]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With a p-value of about 0.37, we'd __fail to reject__ $H_0$&mdash;we don't have strong evidence that the vaccinated group's flu rate differs from 8%. (Not every example needs to come out "significant"&mdash;this is a perfectly reasonable, informative result!)
+:::
+
+### By Hand
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the observed proportion, the z test statistic, and the two-sided p-value by hand.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 9
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 150
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: p0
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: n
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# null value and sample size
+p0 = 0.08
+n = 150
+
+# observed proportion
+phat = 9 / 150
+
+# z test statistic
+z_obs = (phat - p0) / sqrt(p0 * (1 - p0) / n)
+z_obs
+
+# two-sided p-value
+2 * pnorm(abs(z_obs), lower.tail = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# null value and sample size
+p0 = 0.08
+n = 150
+
+# observed proportion
+phat = 9 / 150
+
+# z test statistic
+z_obs = (phat - p0) / sqrt(p0 * (1 - p0) / n)
+z_obs
+```
+[[1] -0.9028939]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+``` r
+# two-sided p-value
+2 * pnorm(abs(z_obs), lower.tail = F)
+```
+[[1] 0.3665822]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+This matches the output from `prop.test()` above.
+:::
+
+### Confidence Interval (Wald)
+
+```{code-blanks-instructions}
+Fill in the code below to calculate a 95% Wald confidence interval for the true proportion.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.975
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# 95% Wald confidence interval
+phat + c(-1, 1) * qnorm(0.975) * sqrt(phat * (1 - phat) / n)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# 95% Wald confidence interval
+phat + c(-1, 1) * qnorm(0.975) * sqrt(phat * (1 - phat) / n)
+```
+[[1] 0.02199489 0.09800511]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+This interval (about 0.022 to 0.098) contains 0.08, consistent with our earlier conclusion that we don't have strong evidence the true rate differs from 8%.
+:::
+
+```{code-blanks-instructions}
+Now calculate the same type of interval using the __plus-4 method__ instead, which tends to perform better (especially with small samples or proportions near 0 or 1). This method simply adds 2 "successes" and 2 "failures" (4 observations total) before calculating a standard Wald interval.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 9
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 150
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 4
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# plus-4 method
+ptilde = (9 + 2) / (150 + 4)
+ptilde + c(-1, 1) * qnorm(0.975) * sqrt(ptilde * (1 - ptilde) / (150 + 4))
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# plus-4 method
+ptilde = (9 + 2) / (150 + 4)
+ptilde + c(-1, 1) * qnorm(0.975) * sqrt(ptilde * (1 - ptilde) / (150 + 4))
+```
+[[1] 0.03075321 0.11210393]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+The plus-4 interval shifts slightly toward 0.5 compared to the Wald interval, and tends to have better coverage properties in practice (especially for smaller samples or extreme proportions).
+:::
+
+```{code-blanks-response}
+Why might adding 2 "successes" and 2 "failures" before calculating the interval help when the true proportion is close to 0 or 1, or the sample size is small?
+```
+
+## When Conditions Fail: The Exact Binomial Test
+
+Suppose instead we're investigating a __rare adverse reaction__ to the vaccine. The historical rate of this reaction is only __1%__. Out of the same 150 patients, __2__ experienced this reaction.
+
+```{code-blanks-instructions}
+Fill in the code below to check the z-test conditions for this scenario ($n = 150$, $p_0 = 0.01$).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 150
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 0.01
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# checking conditions
+150 * 0.01
+150 * (1 - 0.01)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# checking conditions
+150 * 0.01
+150 * (1 - 0.01)
+```
+[[1] 1.5]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+[[1] 148.5]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+$n p_0 = 1.5$ is __well below 5__&mdash;the z-test conditions are violated! We need an exact test instead.
+:::
+
+```{code-blanks-instructions}
+Fill in the code below to run the exact binomial test, testing whether the true adverse reaction rate is __greater than__ 0.01.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 150
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.01
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "greater"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# exact binomial test
+binom.test(x = 2, n = 150, p = 0.01, alternative = "greater")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# exact binomial test
+binom.test(x = 2, n = 150, p = 0.01, alternative = "greater")
+```
+[[1] p-value = 0.443]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With a p-value of about 0.44, we have no evidence that the true adverse reaction rate exceeds the historical 1% baseline.
+:::
+
+```{code-blanks-response}
+In your own words, why can't we just use the z-test here even though we have a reasonably large sample size (n = 150)? What is it about *this specific* null proportion that causes the problem?
+```

@@ -1,0 +1,331 @@
+---
+title: "Module 5: Categorical Data, Part II"
+description: "Fill-in-the-blank coding exercises for Module 5: Chi-Squared Tests"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+  progressive-reveal: true
+title-block-banner: "#7d4f9c"
+title-block-banner-color: white
+---
+
+## Chi-Squared Tests
+
+The chi-squared ($\chi^2$) test shows up in **three** related but distinct situations, all based on comparing observed counts to expected counts:
+
+1. **Goodness-of-fit**: does a single categorical variable follow a specified distribution?
+2. **Homogeneity**: does the distribution of a categorical variable differ across two or more groups?
+3. **Independence**: are two categorical variables associated with each other?
+
+All three use the same test statistic:
+
+$$\chi^2 = \sum \dfrac{(O - E)^2}{E}$$
+
+where $O$ is an observed count and $E$ is the count we'd expect under $H_0$, summed over all cells of a table.
+
+## Goodness-of-Fit
+
+This version tests whether a single categorical variable follows a specified set of proportions.
+
+**Motivating example:** At a flu clinic, lab testing identified which flu strain (A, B, or C) was responsible for each of __200 confirmed flu cases__ this season. Historically, strains are distributed as __50% A, 30% B, 20% C__. This season, the observed counts were: __80 Strain A, 70 Strain B, 50 Strain C__. Does this season's distribution differ from the historical pattern?
+
+### Expected Counts
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the expected count for each strain, under the historical proportions (50%, 30%, 20%), out of 200 total cases.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.5
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.3
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 200
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# observed counts
+obs = c(80, 70, 50)
+
+# expected counts under historical proportions
+exp_props = c(0.5, 0.3, 0.2)
+exp_counts = exp_props * 200
+exp_counts
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# observed counts
+obs = c(80, 70, 50)
+
+# expected counts under historical proportions
+exp_props = c(0.5, 0.3, 0.2)
+exp_counts = exp_props * 200
+exp_counts
+```
+[[1] 100 60 40]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+We'd expect 100 Strain A cases, 60 Strain B, and 40 Strain C under the historical distribution&mdash;but we observed 80, 70, and 50. There's a noticeable shift toward Strains B and C this season.
+:::
+
+### Calculating the Test Statistic
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the chi-squared test statistic by hand.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: obs
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: exp_counts
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# chi-squared test statistic
+sum((obs - exp_counts)^2 / exp_counts)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# chi-squared test statistic
+sum((obs - exp_counts)^2 / exp_counts)
+```
+[[1] 8.166667]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With $k = 3$ categories, this statistic has $k - 1 = 2$ degrees of freedom.
+:::
+
+### Using `chisq.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run the chi-squared goodness-of-fit test directly, using `chisq.test()` with the `p` argument for the hypothesized proportions.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: obs
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.5
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.3
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# chi-squared goodness-of-fit test
+chisq.test(obs, p = c(0.5, 0.3, 0.2), correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# chi-squared goodness-of-fit test
+chisq.test(obs, p = c(0.5, 0.3, 0.2), correct = F)
+```
+[[1] X-squared = 8.1667, df = 2, p-value = 0.01685]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With a p-value of about 0.017, we'd reject $H_0$ and conclude this season's strain distribution __does__ differ from the historical pattern.
+:::
+
+```{code-blanks-response}
+What assumption do we need about the *expected* counts for a chi-squared test to be valid (regardless of which of the three versions we're running)? Were those conditions met here?
+```
+
+## Test of Homogeneity
+
+This version compares the distribution of a categorical outcome **across two or more independent groups**&mdash;it's really just a generalization of the two-proportion z-test (for a 2x2 table) to tables with more rows or columns.
+
+**Motivating example:** Does flu infection rate differ between __vaccinated__ and __unvaccinated__ patients? Among 150 vaccinated patients, 9 got the flu (141 did not). Among 100 unvaccinated patients, 20 got the flu (80 did not).
+
+### Setting Up the Table
+
+Here's our table of counts, with rows for vaccination status and columns for flu status:
+
+```{code-blanks}
+# table of counts: rows = vaccination status, columns = flu (yes, no)
+tbl = matrix(c(9, 141, 20, 80), nrow = 2, byrow = T)
+rownames(tbl) = c("Vaccinated", "Unvaccinated")
+colnames(tbl) = c("Flu", "No Flu")
+tbl
+```
+
+### Checking Expected Counts
+
+Before trusting the chi-squared approximation, let's check that all the expected cell counts are large enough (the usual rule of thumb is at least 5).
+
+```{code-blanks-instructions}
+Fill in the code below to extract the expected counts for this table. (You can pull these from `chisq.test()`'s output, even before looking at the p-value.)
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# expected counts
+chisq.test(tbl, correct = F)$expected
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# expected counts
+chisq.test(tbl, correct = F)$expected
+```
+
+All four expected counts (about 17.4, 132.6, 11.6, and 88.4) are comfortably above 5, so the chi-squared approximation is valid here.
+:::
+
+### Running the Test
+
+```{code-blanks-instructions}
+Fill in the code below to run the chi-squared test of homogeneity on this table.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# chi-squared test of homogeneity
+chisq.test(tbl, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# chi-squared test of homogeneity
+chisq.test(tbl, correct = F)
+```
+[[1] X-squared = 11.468, df = 1, p-value = 0.0007080]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+A p-value of about 0.0007&mdash;strong evidence that flu rate differs between the two groups. In fact, for a 2x2 table like this one, $\chi^2 = z^2$, where $z$ is the test statistic from the corresponding two-proportion z-test!
+:::
+
+```{code-blanks-response}
+Calculate a two-proportion z-test for the same data (`prop.test(x = c(9, 20), n = c(150, 100), correct = F)`), and square the resulting z-statistic (hint: you can extract it, or just compare `$statistic` from each test). Does it match the chi-squared statistic above?
+```
+
+## Test of Independence
+
+This version asks whether **two categorical variables**, both measured on the __same__ group of subjects, are associated with each other (rather than comparing pre-defined groups, as in the homogeneity case). Mechanically, the test is identical&mdash;only the design and interpretation differ.
+
+**Motivating example:** Among __300 flu patients__ (a different, broader sample than our vaccinated/unvaccinated comparison above), is there an association between __age group__ (under 50, 50-65, over 65; 100 patients each) and whether they were hospitalized for the flu? The counts were: under 50 (5 hospitalized, 95 not), 50-65 (10 hospitalized, 90 not), over 65 (15 hospitalized, 85 not).
+
+Here's our table of counts, with rows for age group and columns for hospitalization status:
+
+```{code-blanks}
+# table of counts: rows = age group, columns = hospitalized (yes, no)
+tbl2 = matrix(c(5, 95, 10, 90, 15, 85), nrow = 3, byrow = T)
+rownames(tbl2) = c("Under 50", "50-65", "Over 65")
+colnames(tbl2) = c("Hospitalized", "Not Hospitalized")
+tbl2
+```
+
+```{code-blanks-instructions}
+Before running the test, fill in the code below to check the expected counts for this table.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# expected counts
+chisq.test(tbl2, correct = F)$expected
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# expected counts
+chisq.test(tbl2, correct = F)$expected
+```
+
+All six expected counts come out to either 10 or 90&mdash;comfortably above 5, so the chi-squared approximation is valid here.
+:::
+
+```{code-blanks-instructions}
+Now fill in the code below to run the chi-squared test of independence on `tbl2`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# chi-squared test of independence
+chisq.test(tbl2, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# chi-squared test of independence
+chisq.test(tbl2, correct = F)
+```
+[[1] X-squared = 5.5556, df = 2, p-value = 0.06218]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With a p-value of about 0.062, this is __just above__ the conventional 0.05 cutoff&mdash;a borderline, non-significant result. We don't have quite enough evidence to conclude age group and hospitalization are associated, though the pattern (older patients hospitalized more often) might be worth following up with a larger sample.
+:::
+
+```{code-blanks-response}
+We checked that all of our expected cell counts were 10 or 90&mdash;comfortably above the usual rule-of-thumb minimum of 5. What would you do differently if several expected cell counts came out below 5?
+```

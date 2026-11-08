@@ -1,0 +1,195 @@
+---
+title: "Module 3: Nonparametric Methods, Part II"
+description: "Fill-in-the-blank coding exercises for Module 3: The Wilcoxon Rank-Sum Test"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - days_a = c(5, 7, 4, 9, 6, 3, 8, 5, 4, 6)
+    - days_p = c(12, 15, 9, 20, 11, 14, 25, 10, 18, 13)
+    - pilot2 = data.frame(days_to_control = c(days_a, days_p), group_num = c(rep(1, 10), rep(2, 10)))
+    - pilot2 = pilot2 %>% mutate(group = factor(group_num, levels = c(1, 2), labels = c(\"Drug A\", \"Placebo\")))
+  progressive-reveal: true
+title-block-banner: "#2e8b78"
+title-block-banner-color: white
+---
+
+## The Wilcoxon Rank-Sum Test
+
+The **Wilcoxon rank-sum test** (also called the Mann-Whitney U test) is the nonparametric alternative to the two-sample t-test. Instead of comparing means and requiring (approximate) normality, it compares the **ranks** of observations across two independent groups&mdash;testing whether one group tends to produce systematically larger (or smaller) values than the other.
+
+**Conditions:**
+
+- Random samples from each population
+- Independent samples
+- (No normality assumption needed&mdash;this is the whole point of a nonparametric test!)
+
+**Motivating example:** In a small pilot study, researchers recorded the number of days it took each patient's blood pressure to reach a "controlled" level, comparing __10 patients__ on Drug A to __10 patients__ on Placebo. This "days to control" outcome is a count that's likely to be right-skewed (most patients respond within a week or two, but a few take much longer)&mdash;a good candidate for a rank-based test rather than a t-test. The data are in `pilot2`, with columns `days_to_control` and `group`.
+
+### Looking at the Data
+
+```{code-blanks-instructions}
+Fill in the code below to create a boxplot of `days_to_control` by `group`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: days_to_control
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# boxplot of days to control, by group
+pilot2 %>%
+  ggplot(aes(x = group, y = days_to_control, color = group)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# boxplot of days to control, by group
+pilot2 %>%
+  ggplot(aes(x = group, y = days_to_control, color = group)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+The Drug A group's values should cluster noticeably lower than the Placebo group's&mdash;Drug A patients seem to reach controlled blood pressure faster.
+:::
+
+### Ranking the Combined Data
+
+The rank-sum test works by combining both groups into one pool, ranking __all__ observations together (smallest = rank 1), and then looking at whether one group's ranks tend to be systematically higher or lower than the other's.
+
+```{code-blanks-instructions}
+Fill in the code below to rank all 20 values of `days_to_control` together (ignoring group), and add the ranks as a new column.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: days_to_control
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# rank all observations together
+pilot2 = pilot2 %>%
+  mutate(rank_all = rank(days_to_control))
+
+pilot2
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# rank all observations together
+pilot2 = pilot2 %>%
+  mutate(rank_all = rank(days_to_control))
+
+pilot2
+```
+
+Notice some tied values get tied (averaged) ranks&mdash;for example, two patients with `days_to_control = 4` would each get the average of the two ranks they'd otherwise occupy.
+:::
+
+### Calculating the Test Statistic
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the sum of the ranks within each group.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: rank_all
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# sum of ranks by group
+pilot2 %>%
+  group_by(group) %>%
+  summarise(rank_sum = sum(rank_all))
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# sum of ranks by group
+pilot2 %>%
+  group_by(group) %>%
+  summarise(rank_sum = sum(rank_all))
+```
+
+Drug A's rank sum should be __much lower__ than Placebo's (around 56 vs. 155, out of a total of 210 across all 20 ranks)&mdash;exactly what we'd expect if Drug A patients tend to reach controlled blood pressure faster.
+:::
+
+```{code-blanks-response}
+If the two groups had identical distributions (no real difference), roughly what would you expect the two rank sums to look like? How does that compare to what we found?
+```
+
+### Using `wilcox.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run the Wilcoxon rank-sum test comparing `days_to_control` between the two levels of `group`, using the formula interface. We'll set `correct = F` to turn off the continuity correction (matching our discussion of the test above).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: days_to_control
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# Wilcoxon rank-sum test
+wilcox.test(days_to_control ~ group, data = pilot2, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# Wilcoxon rank-sum test
+wilcox.test(days_to_control ~ group, data = pilot2, correct = F)
+```
+[W = 0.5, p-value = 0.0001786]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Because there are __tied values__ in this data (e.g., two patients with `days_to_control = 4`), R can't compute an exact p-value and will print a warning saying it's using a normal approximation instead&mdash;that's expected and fine here. The p-value is tiny, so we'd conclude there's a significant difference in days-to-control between the two groups.
+:::
+
+```{code-blanks-response}
+This test gave us a very small p-value with only 10 patients per group. Why might a rank-based test like this be a safer choice than a two-sample t-test when you have a small sample and a skewed outcome like "days to reach an event"?
+```

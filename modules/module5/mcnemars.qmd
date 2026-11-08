@@ -1,0 +1,216 @@
+---
+title: "Module 5: Categorical Data, Part IV"
+description: "Fill-in-the-blank coding exercises for Module 5: McNemar's Test"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+  progressive-reveal: true
+title-block-banner: "#7d4f9c"
+title-block-banner-color: white
+---
+
+## McNemar's Test
+
+**McNemar's test** is the categorical analog of the paired t-test: it's used when a __binary__ outcome is measured __twice on the same subjects__ (e.g., before and after an intervention), rather than on two independent groups.
+
+The key insight is that **concordant pairs** (subjects who gave the same answer both times) don't tell us anything about *change*&mdash;only the **discordant pairs** (subjects whose status switched) matter. McNemar's test asks: among the discordant pairs, is one direction of switching more common than the other?
+
+$$H_0: \text{switching in each direction is equally likely} \qquad \text{vs.} \qquad H_A: \text{one direction is more common}$$
+
+**Motivating example:** A clinic measured flu antibody __protection status__ (Protected / Not Protected) in __120 patients__, both __before__ and __after__ a booster shot. We want to know: did the booster shift patients toward being protected?
+
+The results were:
+
+|                        | After: Protected | After: Not Protected |
+|------------------------|:-----------------:|:---------------------:|
+| **Before: Protected**     | 40                | 10                    |
+| **Before: Not Protected** | 35                | 35                    |
+
+### Setting Up the Table
+
+
+
+```{code-blanks}
+# table of before/after protection status
+tbl = matrix(c(40, 10, 35, 35), nrow = 2, byrow = T)
+rownames(tbl) = c("Before: Protected", "Before: Not Protected")
+colnames(tbl) = c("After: Protected", "After: Not Protected")
+tbl
+```
+
+
+
+Notice the two __diagonal__ cells (40 and 35) are the __concordant__ pairs (status didn't change), while the two __off-diagonal__ cells (10 and 35) are the __discordant__ pairs (status changed in one direction or the other).
+
+
+```{code-blanks-response}
+Out of the 120 patients, how many had their protection status *change* between before and after the booster? Why do the 40 patients who were "Protected" both times, and the 35 who were "Not Protected" both times, not help us determine whether the booster had an effect?
+```
+
+### Calculating the Test Statistic by Hand
+
+McNemar's test statistic (without a continuity correction) is:
+
+$$\chi^2 = \dfrac{(b - c)^2}{b + c}$$
+
+where $b$ and $c$ are the two discordant cell counts (here, $b = 10$ patients went from Protected to Not Protected, and $c = 35$ went from Not Protected to Protected).
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the McNemar test statistic by hand.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 10
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 35
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# discordant pair counts
+b = 10
+c = 35
+
+# McNemar test statistic
+stat = (b - c)^2 / (b + c)
+stat
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# discordant pair counts
+b = 10
+c = 35
+
+# McNemar test statistic
+stat = (b - c)^2 / (b + c)
+stat
+```
+[[1] 13.88889]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+:::
+
+```{code-blanks-instructions}
+Fill in the code below to find the p-value, using the fact that this statistic follows a chi-squared distribution with 1 degree of freedom under $H_0$.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: stat
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 1
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# p-value
+pchisq(stat, df = 1, lower.tail = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# p-value
+pchisq(stat, df = 1, lower.tail = F)
+```
+[[1] 0.0001939416]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+A very small p-value&mdash;strong evidence that switching happened more often in one direction (Not Protected &rarr; Protected) than the other, consistent with the booster having a real effect.
+:::
+
+### Using `mcnemar.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run McNemar's test directly on our table, using `correct = F` to match our by-hand calculation above (which didn't use a continuity correction).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# McNemar's test
+mcnemar.test(tbl, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# McNemar's test
+mcnemar.test(tbl, correct = F)
+```
+[[1] McNemar's chi-squared = 13.889, df = 1, p-value = 0.0001939]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+This matches our hand calculation exactly.
+:::
+
+### An Equivalent View: Testing a Proportion
+
+McNemar's test is actually equivalent to testing whether the proportion of discordant pairs going in one particular direction equals 0.5&mdash;i.e., a one-proportion test applied only to the discordant pairs!
+
+```{code-blanks-instructions}
+Fill in the code below to run this as a one-proportion z-test: out of the 45 discordant pairs ($b + c = 10 + 35 = 45$), test whether the proportion that went from Not Protected to Protected ($c = 35$) differs from 0.5.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 35
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 45
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.5
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+# one-proportion test on the discordant pairs
+prop.test(x = 35, n = 45, p = 0.5, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# one-proportion test on the discordant pairs
+prop.test(x = 35, n = 45, p = 0.5, correct = F)
+```
+
+The test statistic here, when squared ($z^2$), should come out to the __same__ value as our McNemar chi-squared statistic (13.889)&mdash;another example of the $z^2 = \chi^2$ relationship we saw with the two-proportion z-test and chi-squared test of homogeneity.
+:::
+
+```{code-blanks-response}
+McNemar's test, a one-proportion test on the discordant pairs, and even a paired t-test (if we coded "Protected" as 1 and "Not Protected" as 0) are all closely related ways of analyzing paired binary data. Why do we specifically exclude the concordant pairs when testing for a *change* in protection status?
+```

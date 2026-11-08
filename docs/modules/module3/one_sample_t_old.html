@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Haley Grant">
+<meta name="description" content="Fill-in-the-blank coding exercises for Module 3: One-Sample t-Tests">
+
+<title>CodingPractice - Module 3: Inference for Numerical Outcomes, Part I</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/code-blanks-0.1.0/code-blanks.js"></script>
+<script src="../../site_libs/quarto-contrib/code-blanks-0.1.0/runner-webr.js"></script>
+<script src="../../site_libs/quarto-contrib/code-blanks-0.1.0/progressive-reveal.js"></script>
+<script src="../../site_libs/quarto-contrib/code-blanks-0.1.0/code-blanks-storage.js"></script>
+<link href="../../site_libs/quarto-contrib/code-blanks-0.1.0/code-blanks.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: white;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: white;
+background: #2e8b78;
+      }
+</style>
+<script>window.codeBlanksPackages = ["tidyverse"];window.codeBlanksSetup = `library(tidyverse)
+set.seed(999)
+baseline_A = rnorm(100, 142, 8)
+followup_A = rnorm(100, 128, 9)
+baseline_P = rnorm(100, 141, 8)
+followup_P = rnorm(100, 138, 9)
+htn_trial = data.frame(group_num = c(rep(1, 100), rep(2, 100)), sbp_baseline = c(baseline_A, baseline_P), sbp_followup = c(followup_A, followup_P))
+htn_trial = htn_trial %>% mutate(sbp_change = sbp_followup - sbp_baseline)`;window.codeBlanksPlotWidth = 800;window.codeBlanksPlotHeight = 500;window.codeBlanksProgressiveReveal = true;</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">CodingPractice</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Module 3: Inference for Numerical Outcomes, Part I</h1>
+                  <div>
+        <div class="description">
+          Fill-in-the-blank coding exercises for Module 3: One-Sample t-Tests
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Haley Grant </p>
+            </div>
+    </div>
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="one-sample-t-tests" class="level2">
+<h2 class="anchored" data-anchor-id="one-sample-t-tests">One-Sample t-tests</h2>
+<p>A <strong>one-sample t-test</strong> is used to make inference about a population mean using a single sample.</p>
+<p><strong>Conditions:</strong></p>
+<ul>
+<li>Random sample from the population</li>
+<li><span class="math inline">\(n &gt; 30\)</span>, <strong>or</strong> the original variable follows a normal distribution in the population</li>
+</ul>
+<p><span class="math display">\[H_0: \mu = \mu_0 \qquad \text{vs.} \qquad H_A: \mu \ne \mu_0 \ \ (\text{or} \ &lt;, \ &gt;)\]</span></p>
+<p>where <span class="math inline">\(\mu\)</span> is the population mean.</p>
+<p><strong>Motivating example:</strong> A clinical trial is testing a new antihypertensive drug (“Drug A”) against a placebo in patients with Stage 1 hypertension. Each of the <strong>200 patients</strong> (100 per group) has a <strong>baseline</strong> systolic blood pressure (SBP, in mmHg) and a <strong>12-week follow-up</strong> SBP. We’ll use this same trial throughout Module 3 to practice different tests. The data are stored in <code>htn_trial</code>, with columns <code>group</code>, <code>sbp_baseline</code>, <code>sbp_followup</code>, and <code>sbp_change</code> (follow-up minus baseline).</p>
+<p>For this first test, we’ll focus on a simple question: <strong>is the average follow-up SBP in the Drug A group below the clinical hypertension threshold of 130 mmHg?</strong></p>
+<section id="creating-a-factor-variable" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-factor-variable">Creating a Factor Variable</h3>
+<p>Right now, the treatment group is stored in <code>htn_trial$group_num</code> as a <strong>number</strong> (1 = Drug A, 2 = Placebo). If we tried to use this numeric column directly in later analyses (like ANOVA, in Module 4), R would incorrectly treat it as a continuous predictor instead of a grouping variable! Let’s fix that now by creating a proper factor column called <code>group</code>.</p>
+<div class="code-blanks-instructions-box">
+<p>Fill in the code below to create a new column, <code>group</code>, that labels <code>group_num == 1</code> as <code>"Drug A"</code> and <code>group_num == 2</code> as <code>"Placebo"</code>.</p>
+</div>
+<pre class="code-blanks"><code># create a labeled factor variable for treatment group
+htn_trial = htn_trial %&gt;%
+  mutate(group = factor(<input class="code-blank-input" data-answer="group_num" data-default="" value="" size="11">, levels = c(1, 2), labels = c(<input class="code-blank-input" data-answer="&quot;Drug A&quot;" data-default="" value="" size="10">, <input class="code-blank-input" data-answer="&quot;Placebo&quot;" data-default="" value="" size="11">)))
+
+# check that it worked
+head(htn_trial)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a labeled factor variable for treatment group</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>htn_trial <span class="ot">=</span> htn_trial <span class="sc">%&gt;%</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">factor</span>(group_num, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Drug A"</span>, <span class="st">"Placebo"</span>)))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># check that it worked</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(htn_trial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You should now see a new column, <code>group</code>, with labels <code>"Drug A"</code> and <code>"Placebo"</code> instead of <code>1</code> and <code>2</code>. We’ll use this labeled version throughout the rest of this document (and throughout Module 3).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="checking-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="checking-conditions">Checking Conditions</h3>
+<div class="code-blanks-instructions-box">
+<p>Filter <code>htn_trial</code> to only the Drug A group (recall <code>group_num == 1</code> is Drug A), and plot a histogram of <code>sbp_followup</code> to check the shape of the distribution.</p>
+</div>
+<pre class="code-blanks"><code># filter to the Drug A group and plot a histogram of follow-up SBP
+htn_trial %&gt;%
+  filter(<input class="code-blank-input" data-answer="group_num" data-default="" value="" size="11"> == 1) %&gt;%
+  ggplot(aes(x = <input class="code-blank-input" data-answer="sbp_followup" data-default="" value="" size="14">)) +
+  geom_histogram(fill = "blue", bins = 20) +
+  theme_bw()</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter to the Drug A group and plot a histogram of follow-up SBP</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>htn_trial <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(group_num <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sbp_followup)) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">bins =</span> <span class="dv">20</span>) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You should see a roughly <strong>bell-shaped, symmetric</strong> distribution centered somewhere in the 120s. Either way, with <strong>n = 100</strong>, we’d be comfortable relying on the CLT even if the data were somewhat non-normal.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="calculating-the-test-statistic" class="level3">
+<h3 class="anchored" data-anchor-id="calculating-the-test-statistic">Calculating the Test Statistic</h3>
+<p>Suppose a summary of the Drug A group’s follow-up SBP showed a sample mean of <span class="math inline">\(\bar{x} = 128\)</span> and sample standard deviation of <span class="math inline">\(s = 9\)</span>, based on <span class="math inline">\(n = 100\)</span> patients. We want to test <span class="math inline">\(H_0: \mu = 130\)</span> vs.&nbsp;<span class="math inline">\(H_A: \mu &lt; 130\)</span>.</p>
+<p>Recall the formula for a one-sample t-test statistic:</p>
+<p><span class="math display">\[t_{obs} = \dfrac{\bar{x} - \mu_0}{s / \sqrt{n}}\]</span></p>
+<div class="code-blanks-instructions-box">
+<p>Fill in the code below to calculate the test statistic, testing against <span class="math inline">\(\mu_0 = 130\)</span>.</p>
+</div>
+<pre class="code-blanks"><code># summary statistics
+xbar = <input class="code-blank-input" data-answer="128" data-default="" value="" size="5">
+mu0 = <input class="code-blank-input" data-answer="130" data-default="" value="" size="5">
+s = <input class="code-blank-input" data-answer="9" data-default="" value="" size="4">
+n = <input class="code-blank-input" data-answer="100" data-default="" value="" size="5">
+
+# standard error
+se = s / sqrt(n)
+
+# test statistic
+t_obs = (xbar - mu0) / se
+t_obs</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># summary statistics</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>xbar <span class="ot">=</span> <span class="dv">128</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>mu0 <span class="ot">=</span> <span class="dv">130</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>s <span class="ot">=</span> <span class="dv">9</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># standard error</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>se <span class="ot">=</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># test statistic</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>t_obs <span class="ot">=</span> (xbar <span class="sc">-</span> mu0) <span class="sc">/</span> se</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>t_obs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">[1] -2.222222</span></p>
+<p>Our observed test statistic is negative, consistent with a sample mean (128) that’s below the hypothesized value (130).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="rejection-region" class="level3">
+<h3 class="anchored" data-anchor-id="rejection-region">Rejection Region</h3>
+<p>Since <span class="math inline">\(H_A: \mu &lt; \mu_0\)</span>, this is a <strong>one-sided, lower-tailed</strong> test. The rejection region is in the <strong>left tail</strong> of the <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(n - 1\)</span> degrees of freedom.</p>
+<div class="code-blanks-instructions-box">
+<p>Find the critical value (rejection region cutoff) for a lower-tailed test with <span class="math inline">\(\alpha = 0.05\)</span> and <span class="math inline">\(n - 1 = 99\)</span> degrees of freedom.</p>
+</div>
+<pre class="code-blanks"><code># significance level
+alph = <input class="code-blank-input" data-answer="0.05" data-default="" value="" size="6">
+
+# lower-tailed rejection region cutoff
+qt(alph, df = <input class="code-blank-input" data-answer="n - 1" data-default="" value="" size="7">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># significance level</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>alph <span class="ot">=</span> <span class="fl">0.05</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lower-tailed rejection region cutoff</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">qt</span>(alph, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">[1] -1.660391</span></p>
+<p>Since our observed test statistic (-2.22) is <strong>more negative</strong> than this cutoff (-1.66), it falls in the rejection region.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>Based on the rejection region above, would we reject or fail to reject <span class="math inline">\(H_0\)</span>? What would that mean in the context of this study?</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
+</section>
+<section id="p-value" class="level3">
+<h3 class="anchored" data-anchor-id="p-value">P-value</h3>
+<div class="code-blanks-instructions-box">
+<p>Calculate the one-sided (lower-tailed) p-value corresponding to our test statistic, using <code>pt()</code>. Since we want the area to the <strong>left</strong> of our test statistic, we can use the default <code>lower.tail = TRUE</code> (the default, so you don’t need to specify it).</p>
+</div>
+<pre class="code-blanks"><code># one-sided (lower-tailed) p-value
+pt(t_obs, df = <input class="code-blank-input" data-answer="n - 1" data-default="" value="" size="7">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># one-sided (lower-tailed) p-value</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pt</span>(t_obs, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">[1] 0.01427224</span></p>
+<p>This p-value (0.014) is <strong>less than 0.05</strong>, so we would reject <span class="math inline">\(H_0\)</span> and conclude that average follow-up SBP in the Drug A group is below 130—consistent with our rejection region result above.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="confidence-interval" class="level3">
+<h3 class="anchored" data-anchor-id="confidence-interval">Confidence Interval</h3>
+<p>A one-sided 95% confidence interval for <span class="math inline">\(H_A: \mu &lt; \mu_0\)</span> has the form <span class="math inline">\(\left(-\infty, \ \bar{x} + t^* \cdot se\right)\)</span>, where <span class="math inline">\(t^*\)</span> is the <strong>upper</strong> 95th-percentile critical value (note: this is a different cutoff than the one we used for the rejection region above, since that one captured the lower 5% rather than the upper 5%).</p>
+<div class="code-blanks-instructions-box">
+<p>Calculate the upper bound of a one-sided 95% confidence interval for the population mean follow-up SBP.</p>
+</div>
+<pre class="code-blanks"><code># one-sided 95% CI upper bound
+xbar + qt(<input class="code-blank-input" data-answer="0.95" data-default="" value="" size="6">, df = <input class="code-blank-input" data-answer="n - 1" data-default="" value="" size="7">) * se</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># one-sided 95% CI upper bound</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>xbar <span class="sc">+</span> <span class="fu">qt</span>(<span class="fl">0.95</span>, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">[1] 129.4944</span></p>
+<p>We are 95% confident that the true average follow-up SBP in the Drug A group is <strong>no more than about 129.5</strong>—which is indeed below our threshold of 130. This agrees with our rejection region and p-value results, as it should, since all three methods lead to the same conclusion.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="using-t.test" class="level3">
+<h3 class="anchored" data-anchor-id="using-t.test">Using <code>t.test()</code></h3>
+<p>All of this can be done in a single step using the built-in <code>t.test()</code> function.</p>
+<div class="code-blanks-instructions-box">
+<p>Fill in the code below to run a one-sample t-test on the Drug A group’s <code>sbp_followup</code>, testing against <span class="math inline">\(\mu_0 = 130\)</span> with the alternative hypothesis that the mean is <strong>less than</strong> 130.</p>
+</div>
+<pre class="code-blanks"><code># one-sample t-test
+drug_a_followup = htn_trial %&gt;% filter(<input class="code-blank-input" data-answer="group_num" data-default="" value="" size="11"> == 1) %&gt;% pull(sbp_followup)
+t.test(drug_a_followup, mu = <input class="code-blank-input" data-answer="130" data-default="" value="" size="5">, alternative = <input class="code-blank-input" data-answer="&quot;less&quot;" data-default="" value="" size="8">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># one-sample t-test</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>drug_a_followup <span class="ot">=</span> htn_trial <span class="sc">%&gt;%</span> <span class="fu">filter</span>(group_num <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(sbp_followup)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(drug_a_followup, <span class="at">mu =</span> <span class="dv">130</span>, <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Since <code>htn_trial</code> is simulated data, the exact numbers won’t match our hand calculation above exactly—but they should tell a similar story, given that we simulated this group’s follow-up SBP with a true mean around 128.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>Compare the output of <code>t.test()</code> to our manual calculations above. Are the general conclusions (reject vs.&nbsp;fail to reject) consistent, even if the exact numbers differ slightly?</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
+</section>
+<section id="one-sided-vs.-two-sided-tests" class="level3">
+<h3 class="anchored" data-anchor-id="one-sided-vs.-two-sided-tests">One-Sided vs.&nbsp;Two-Sided Tests</h3>
+<div class="code-blanks-instructions-box">
+<p>Modify the code above to run the <strong>same test</strong>, but using a two-sided alternative instead.</p>
+</div>
+<pre class="code-blanks"><code># two-sided one-sample t-test
+t.test(drug_a_followup, mu = <input class="code-blank-input" data-answer="130" data-default="" value="" size="5">, alternative = <input class="code-blank-input" data-answer="&quot;two.sided&quot;" data-default="" value="" size="13">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># two-sided one-sample t-test</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(drug_a_followup, <span class="at">mu =</span> <span class="dv">130</span>, <span class="at">alternative =</span> <span class="st">"two.sided"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The test statistic stays the same, but the <strong>p-value roughly doubles</strong> compared to the one-sided test, and the confidence interval becomes <strong>two-sided</strong> (both a lower and upper bound) instead of having an infinite lower bound.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>In general, when is it appropriate to use a one-sided test instead of a two-sided test? Why is it considered poor practice to choose the direction of a one-sided test <em>after</em> looking at your data?</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
+</section>
+</section>
+<section id="sample-size-and-power" class="level2">
+<h2 class="anchored" data-anchor-id="sample-size-and-power">Sample Size and Power</h2>
+<p>Before collecting data, we often want to know how large a sample we’ll need to detect a meaningful effect, or how much power a given sample size will provide. R’s <code>power.t.test()</code> function handles this for one-sample (and paired) t-tests.</p>
+<div class="code-blanks-instructions-box">
+<p>Suppose we want to detect a true difference (<code>delta</code>) of <strong>2 mmHg</strong> from the null value, assuming a standard deviation of <strong>9</strong>, with a significance level of <strong>0.05</strong> and <strong>80% power</strong>, using a <strong>one-sided</strong> test. Fill in the code below to find the required sample size.</p>
+</div>
+<pre class="code-blanks"><code># required sample size for 80% power
+power.t.test(delta = <input class="code-blank-input" data-answer="2" data-default="" value="" size="4">, sd = <input class="code-blank-input" data-answer="9" data-default="" value="" size="4">, sig.level = <input class="code-blank-input" data-answer="0.05" data-default="" value="" size="6">,
+             power = <input class="code-blank-input" data-answer="0.8" data-default="" value="" size="5">, type = <input class="code-blank-input" data-answer="&quot;one.sample&quot;" data-default="" value="" size="14">, alternative = <input class="code-blank-input" data-answer="&quot;one.sided&quot;" data-default="" value="" size="13">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># required sample size for 80% power</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">power.t.test</span>(<span class="at">delta =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">9</span>, <span class="at">sig.level =</span> <span class="fl">0.05</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">power =</span> <span class="fl">0.8</span>, <span class="at">type =</span> <span class="st">"one.sample"</span>, <span class="at">alternative =</span> <span class="st">"one.sided"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">n = 126.5606</span></p>
+<p>We would need about <strong>127 participants</strong> (always round up!) to have an 80% chance of detecting a true difference of 2 mmHg, if one exists.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-instructions-box">
+<p>Now suppose we only have <strong>100 participants</strong> available (as in our actual Drug A group). Fill in the code below to calculate the power of our test under the same assumptions (<code>delta = 2</code>, <code>sd = 9</code>, one-sample, one-sided).</p>
+</div>
+<pre class="code-blanks"><code># power with n = <input class="code-blank-input" data-answer="100" data-default="" value="" size="5">
+power.t.test(n = 100, delta = <input class="code-blank-input" data-answer="2" data-default="" value="" size="4">, sd = <input class="code-blank-input" data-answer="9" data-default="" value="" size="4">,
+             type = <input class="code-blank-input" data-answer="&quot;one.sample&quot;" data-default="" value="" size="14">, alternative = <input class="code-blank-input" data-answer="&quot;one.sided&quot;" data-default="" value="" size="13">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># power with n = 100</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">power.t.test</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">delta =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">9</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">type =</span> <span class="st">"one.sample"</span>, <span class="at">alternative =</span> <span class="st">"one.sided"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">power = 0.71299</span></p>
+<p>With 100 participants, our power is about <strong>71.3%</strong>—a bit short of the 80% we were aiming for.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>Based on what you know about power, would you expect this power (71.3%) to be <strong>higher or lower</strong> if we used a two-sided test instead of one-sided? What about if the true effect size (<code>delta</code>) were larger, say 4 instead of 2? You can check your intuition by modifying the code above.</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

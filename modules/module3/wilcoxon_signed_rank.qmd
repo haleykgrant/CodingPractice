@@ -1,0 +1,187 @@
+---
+title: "Module 3: Nonparametric Methods, Part I"
+description: "Fill-in-the-blank coding exercises for Module 3: The Wilcoxon Signed-Rank Test"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - pilot_change = c(-5, -22, -18, -3, -9, -30, 2, -14, -11, -16, -7, -25)
+  progressive-reveal: true
+title-block-banner: "#2e8b78"
+title-block-banner-color: white
+---
+
+## The Wilcoxon Signed-Rank Test
+
+The **Wilcoxon signed-rank test** is the nonparametric alternative to the one-sample (or paired) t-test. Instead of assuming the data (or differences) are normally distributed, it only requires that the distribution be __symmetric__ around its median. This makes it a useful option when sample sizes are small and the data look skewed, so we can't confidently rely on the CLT.
+
+**Conditions:**
+
+- Random sample
+- The distribution of differences is (approximately) symmetric around the median
+
+$$H_0: \text{median} = m_0 \qquad \text{vs.} \qquad H_A: \text{median} \ne m_0 \ \ (\text{or} \ <, \ >)$$
+
+**Motivating example:** Before launching the full hypertension trial, the research team ran a small __pilot study__ with just __12 patients__ in the Drug A group, to get an early read on whether the drug had any effect at all. The changes in SBP (follow-up minus baseline) for these 12 patients are stored in `pilot_change`. With such a small sample, and visibly skewed values, we're hesitant to assume normality&mdash;so we'll use the Wilcoxon signed-rank test instead of a paired/one-sample t-test.
+
+### Looking at the Data
+
+```{code-blanks-instructions}
+Print `pilot_change` and create a quick histogram to see the shape of the distribution.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: pilot_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# look at the pilot data
+pilot_change
+
+data.frame(change = pilot_change) %>%
+  ggplot(aes(x = change)) +
+  geom_histogram(bins = 8, fill = "blue", color = "black") +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# look at the pilot data
+pilot_change
+```
+[[1] -5 -22 -18 -3 -9 -30 2 -14 -11 -16 -7 -25]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With only 11 of 12 values negative, and values ranging from -30 to +2, this small sample doesn't look like a great candidate for assuming normality&mdash;a good case for a nonparametric test.
+:::
+
+### Ranking the Data by Hand
+
+The signed-rank test works by: (1) taking the absolute difference from the hypothesized median ($m_0 = 0$ here, since we're testing whether SBP changed at all), (2) ranking those absolute differences from smallest to largest, and (3) summing the ranks of the *positive* differences (this sum is often called $V$ or $W^+$).
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the absolute values of `pilot_change`, then rank them using `rank()`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: pilot_change
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# absolute values
+abs_vals = abs(pilot_change)
+
+# ranks of absolute values (smallest = rank 1)
+ranks = rank(abs(pilot_change))
+
+data.frame(change = pilot_change, abs_change = abs_vals, rank = ranks)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# absolute values
+abs_vals = abs(pilot_change)
+
+# ranks of absolute values (smallest = rank 1)
+ranks = rank(abs(pilot_change))
+
+data.frame(change = pilot_change, abs_change = abs_vals, rank = ranks)
+```
+
+The value `2` (smallest absolute value) gets rank 1, and `-30` (largest absolute value) gets rank 12. Notice __only one__ value (`2`) is positive&mdash;the rest are negative.
+:::
+
+### Calculating the Test Statistic
+
+```{code-blanks-instructions}
+Fill in the code below to calculate $W^+$, the sum of the ranks corresponding to __positive__ values of `pilot_change`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: pilot_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# sum of ranks for positive differences
+W_plus = sum(ranks[pilot_change > 0])
+W_plus
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# sum of ranks for positive differences
+W_plus = sum(ranks[pilot_change > 0])
+W_plus
+```
+[[1] 1]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Since only the smallest-magnitude value (rank 1) was positive, $W^+ = 1$&mdash;about as small as it could possibly be. This is a strong signal that the true median change is __negative__ (i.e., SBP decreased).
+:::
+
+```{code-blanks-response}
+If there were *no* real effect (median change = 0), would you expect roughly half the positive and negative values to have large ranks, or would you expect the pattern we see here (all the large ranks going to negative values)? What does our result suggest?
+```
+
+### Using `wilcox.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run the Wilcoxon signed-rank test on `pilot_change`, testing against a hypothesized median of 0.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: pilot_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# Wilcoxon signed-rank test
+wilcox.test(pilot_change, mu = 0)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# Wilcoxon signed-rank test
+wilcox.test(pilot_change, mu = 0)
+```
+[V = 1, p-value = 0.0009766]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+The reported test statistic, `V`, matches our hand-calculated $W^+ = 1$. The p-value (about 0.001) is well below 0.05, so we'd reject $H_0$ and conclude the median change in SBP is significantly different from 0&mdash;consistent with what the (much larger) full trial later confirmed.
+:::
+
+```{code-blanks-response}
+In this example, the Wilcoxon signed-rank test and a paired t-test would likely agree on the conclusion. In general, why might we prefer the Wilcoxon test over a t-test specifically for a small, skewed sample like this one?
+```

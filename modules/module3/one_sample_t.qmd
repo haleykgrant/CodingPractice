@@ -1,0 +1,540 @@
+---
+title: "Module 3: Inference for Numerical Outcomes, Part I"
+description: "Fill-in-the-blank coding exercises for Module 3: One-Sample t-Tests"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - set.seed(999)
+    - baseline_A = rnorm(100, 142, 8)
+    - followup_A = rnorm(100, 128, 9)
+    - baseline_P = rnorm(100, 141, 8)
+    - followup_P = rnorm(100, 138, 9)
+    - htn_trial = data.frame(group_num = c(rep(1, 100), rep(2, 100)), sbp_baseline = c(baseline_A, baseline_P), sbp_followup = c(followup_A, followup_P))
+    - htn_trial = htn_trial %>% mutate(sbp_change = sbp_followup - sbp_baseline)
+  progressive-reveal: true
+title-block-banner: "#2e8b78"
+title-block-banner-color: white
+---
+
+## One-Sample t-tests
+
+A **one-sample t-test** is used to make inference about a population mean using a single sample.
+
+**Conditions:**
+
+- Random sample from the population
+- $n > 30$, __or__ the original variable follows a normal distribution in the population
+
+$$H_0: \mu = \mu_0 \qquad \text{vs.} \qquad H_A: \mu \ne \mu_0 \ \ (\text{or} \ <, \ >)$$
+
+where $\mu$ is the population mean.
+
+**Motivating example:** A clinical trial is testing a new antihypertensive drug ("Drug A") against a placebo in patients with Stage 1 hypertension. Each of the __200 patients__ (100 per group) has a __baseline__ systolic blood pressure (SBP, in mmHg) and a __12-week follow-up__ SBP. We'll use this same trial throughout Module 3 to practice different tests. The data are stored in `htn_trial`, with columns `group`, `sbp_baseline`, `sbp_followup`, and `sbp_change` (follow-up minus baseline).
+
+For this first test, we'll focus on a simple question: __is the average follow-up SBP in the Drug A group below the clinical hypertension threshold of 130 mmHg?__
+
+### Creating a Factor Variable
+
+Right now, the treatment group is stored in `htn_trial$group_num` as a __number__ (1 = Drug A, 2 = Placebo). If we tried to use this numeric column directly in later analyses (like ANOVA, in Module 4), R would incorrectly treat it as a continuous predictor instead of a grouping variable! Let's fix that now by creating a proper factor column called `group`.
+
+```{code-blanks-instructions}
+Fill in the code below to create a new column, `group`, that labels `group_num == 1` as `"Drug A"` and `group_num == 2` as `"Placebo"`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group_num
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "Drug A"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "Placebo"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# create a labeled factor variable for treatment group
+htn_trial = htn_trial %>%
+  mutate(group = factor(group_num, levels = c(1, 2), labels = c("Drug A", "Placebo")))
+
+# check that it worked
+head(htn_trial)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# create a labeled factor variable for treatment group
+htn_trial = htn_trial %>%
+  mutate(group = factor(group_num, levels = c(1, 2), labels = c("Drug A", "Placebo")))
+
+# check that it worked
+head(htn_trial)
+```
+
+You should now see a new column, `group`, with labels `"Drug A"` and `"Placebo"` instead of `1` and `2`. We'll use this labeled version throughout the rest of this document (and throughout Module 3).
+:::
+
+### Checking Conditions
+
+```{code-blanks-instructions}
+Filter `htn_trial` to only the Drug A group (recall `group_num == 1` is Drug A), and plot a histogram of `sbp_followup` to check the shape of the distribution.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group_num
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: sbp_followup
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# filter to the Drug A group and plot a histogram of follow-up SBP
+htn_trial %>%
+  filter(group_num == 1) %>%
+  ggplot(aes(x = sbp_followup)) +
+  geom_histogram(fill = "blue", bins = 20) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# filter to the Drug A group and plot a histogram of follow-up SBP
+htn_trial %>%
+  filter(group_num == 1) %>%
+  ggplot(aes(x = sbp_followup)) +
+  geom_histogram(fill = "blue", bins = 20) +
+  theme_bw()
+```
+
+You should see a roughly __bell-shaped, symmetric__ distribution centered somewhere in the 120s. Either way, with __n = 100__, we'd be comfortable relying on the CLT even if the data were somewhat non-normal.
+:::
+
+### Calculating the Test Statistic
+
+Suppose a summary of the Drug A group's follow-up SBP showed a sample mean of $\bar{x} = 128$ and sample standard deviation of $s = 9$, based on $n = 100$ patients. We want to test $H_0: \mu = 130$ vs. $H_A: \mu < 130$.
+
+Recall the formula for a one-sample t-test statistic:
+
+$$t_{obs} = \dfrac{\bar{x} - \mu_0}{s / \sqrt{n}}$$
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the standard error and the test statistic, testing against $\mu_0 = 130$.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: s
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: n
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: xbar
+#|   prefill: false
+#|   occurrence: 3
+#|   match: token
+#| blank:
+#|   target: mu0
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: se
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# summary statistics
+xbar = mean(htn_trial$sbp_followup[htn_trial$group_num==1])
+mu0 = 130
+s = sd(htn_trial$sbp_followup[htn_trial$group_num==1])
+n = sum(htn_trial$group_num==1)
+
+# print values
+xbar ;  s; n
+
+# standard error
+se = s / sqrt(n)
+
+# test statistic
+t_obs = (xbar - mu0) / se
+t_obs
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# summary statistics
+xbar = mean(htn_trial$sbp_followup[htn_trial$group_num==1])
+mu0 = 130
+s = sd(htn_trial$sbp_followup[htn_trial$group_num==1])
+n = sum(htn_trial$group_num==1)
+
+# print values
+xbar ; s; n
+
+# standard error
+se = s / sqrt(n)
+
+# test statistic
+t_obs = (xbar - mu0) / se
+t_obs
+```
+[[1] 127.3865
+[1] 130
+[1] 8.059693
+[1] 100
+[1] -3.24262{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Our observed test statistic is negative, consistent with a sample mean (127.4) that's below the hypothesized value (130).
+:::
+
+### Rejection Region
+
+Since $H_A: \mu < \mu_0$, this is a __one-sided, lower-tailed__ test. The rejection region is in the __left tail__ of the $t$ distribution with $n - 1$ degrees of freedom.
+
+```{code-blanks-instructions}
+Find the critical value (rejection region cutoff) for a lower-tailed test with $\alpha = 0.05$ and $n - 1 = 99$ degrees of freedom.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.05
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: n - 1
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# significance level
+alph = 0.05
+
+# lower-tailed rejection region cutoff
+qt(alph, df = n - 1)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# significance level
+alph = 0.05
+
+# lower-tailed rejection region cutoff
+qt(alph, df = n - 1)
+```
+[[1] -1.660391]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Since our observed test statistic (-3.24) is __more negative__ than this cutoff (-1.66), it falls in the rejection region.
+:::
+
+```{code-blanks-response}
+Based on the rejection region above, would we reject or fail to reject $H_0$? What would that mean in the context of this study?
+```
+
+### P-value
+
+```{code-blanks-instructions}
+Calculate the one-sided (lower-tailed) p-value corresponding to our test statistic, using `pt()`. Since we want the area to the **left** of our test statistic, we can use the default `lower.tail = TRUE` (the default, so you don't need to specify it).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: n - 1
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# one-sided (lower-tailed) p-value
+pt(t_obs, df = n - 1)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# one-sided (lower-tailed) p-value
+pt(t_obs, df = n - 1)
+```
+[[1] 0.0008073392]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+This p-value (0.0008) is __less than 0.05__, so we would reject $H_0$ and conclude that average follow-up SBP in the Drug A group is below 130&mdash;consistent with our rejection region result above.
+:::
+
+### Confidence Interval
+
+A one-sided 95% confidence interval for $H_A: \mu < \mu_0$ has the form $\left(-\infty, \ \bar{x} + t^* \cdot se\right)$, where $t^*$ is the __upper__ 95th-percentile critical value (note: this is a different cutoff than the one we used for the rejection region above, since that one captured the lower 5% rather than the upper 5%).
+
+```{code-blanks-instructions}
+Calculate the upper bound of a one-sided 95% confidence interval for the population mean follow-up SBP.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.95
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: n - 1
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# one-sided 95% CI upper bound
+xbar + qt(0.95, df = n - 1) * se
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# one-sided 95% CI upper bound
+xbar + qt(0.95, df = n - 1) * se
+```
+[[1] 128.7248]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+We are 95% confident that the true average follow-up SBP in the Drug A group is __no more than about 128.7__&mdash;which is indeed below our threshold of 130. This agrees with our rejection region and p-value results, as it should, since all three methods lead to the same conclusion.
+:::
+
+### Using `t.test()`
+
+All of this can be done in a single step using the built-in `t.test()` function.
+
+```{code-blanks-instructions}
+Fill in the code below to run a one-sample t-test on the Drug A group's `sbp_followup`, testing against $\mu_0 = 130$ with the alternative hypothesis that the mean is __less than__ 130.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group_num
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 130
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "less"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# one-sample t-test
+drug_a_followup = htn_trial %>% filter(group_num == 1) %>% pull(sbp_followup)
+t.test(drug_a_followup, mu = 130, alternative = "less")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# one-sample t-test
+drug_a_followup = htn_trial %>% filter(group_num == 1) %>% pull(sbp_followup)
+t.test(drug_a_followup, mu = 130, alternative = "less")
+```
+
+We can see that the numbers here match out by-hand calculations.
+:::
+
+```{code-blanks-response}
+Compare the output of `t.test()` to our manual calculations above. Are the general conclusions (reject vs. fail to reject) consistent?
+```
+
+### One-Sided vs. Two-Sided Tests
+
+```{code-blanks-instructions}
+Modify the code above to run the __same test__, but using a two-sided alternative instead.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 130
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "two.sided"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# two-sided one-sample t-test
+t.test(drug_a_followup, mu = 130, alternative = "two.sided")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# two-sided one-sample t-test
+t.test(drug_a_followup, mu = 130, alternative = "two.sided")
+```
+
+The test statistic stays the same, but the __p-value doubles__ compared to the one-sided test, and the confidence interval becomes __two-sided__ (both a lower and upper bound) instead of having an infinite lower bound.
+:::
+
+```{code-blanks-response}
+In general, when is it appropriate to use a one-sided test instead of a two-sided test? Why is it considered poor practice to choose the direction of a one-sided test *after* looking at your data?
+```
+
+## Sample Size and Power
+
+Before collecting data, we often want to know how large a sample we'll need to detect a meaningful effect, or how much power a given sample size will provide. R's `power.t.test()` function handles this for one-sample (and paired) t-tests.
+
+```{code-blanks-instructions}
+Suppose we want to detect a true difference (`delta`) of __2 mmHg__ from the null value, assuming a standard deviation of __9__, with a significance level of __0.05__ and __80% power__, using a __one-sided__ test. Fill in the code below to find the required sample size.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 9
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.05
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.8
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "one.sample"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "one.sided"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# required sample size for 80% power
+power.t.test(delta = 2, 
+             sd = 9, 
+             sig.level = 0.05,
+             power = 0.8, 
+             type = "one.sample", 
+             alternative = "one.sided")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# required sample size for 80% power
+power.t.test(delta = 2, 
+             sd = 9, 
+             sig.level = 0.05,
+             power = 0.8, 
+             type = "one.sample", 
+             alternative = "one.sided")
+```
+
+[n = 126.5606]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+We would need about __127 participants__ (always round up!) to have an 80% chance of detecting a true difference of 2 mmHg, if one exists.
+:::
+
+```{code-blanks-instructions}
+Now suppose we only have __100 participants__ available (as in our actual Drug A group). Fill in the code below to calculate the power of our test under the same assumptions (`delta = 2`, `sd = 9`, one-sample, one-sided).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 100
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: 2
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 9
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "one.sample"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "one.sided"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# power with n = 100
+power.t.test(n = 100, 
+             delta = 2, 
+             sd = 9,
+             type = "one.sample", 
+             alternative = "one.sided")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# power with n = 100
+power.t.test(n = 100, 
+             delta = 2, 
+             sd = 9,
+             type = "one.sample", 
+             alternative = "one.sided")
+```
+
+[power = 0.71299]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With 100 participants, our power is about __71.3%__&mdash;a bit short of the 80% we were aiming for.
+:::
+
+```{code-blanks-response}
+Based on what you know about power, would you expect this power (71.3%) to be __higher or lower__ if we used a two-sided test instead of one-sided? What about if the true effect size (`delta`) were larger, say 4 instead of 2? You can check your intuition by modifying the code above.
+```

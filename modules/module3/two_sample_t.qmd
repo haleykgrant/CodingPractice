@@ -1,0 +1,557 @@
+---
+title: "Module 3: Inference for Numerical Outcomes, Part II"
+description: "Fill-in-the-blank coding exercises for Module 3: Two-Sample t-Tests"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+    - set.seed(999)
+    - baseline_A = rnorm(100, 142, 8)
+    - followup_A = rnorm(100, 128, 9)
+    - baseline_P = rnorm(100, 141, 8)
+    - followup_P = rnorm(100, 138, 9)
+    - htn_trial = data.frame(group_num = c(rep(1, 100), rep(2, 100)), sbp_baseline = c(baseline_A, baseline_P), sbp_followup = c(followup_A, followup_P))
+    - htn_trial = htn_trial %>% mutate(sbp_change = sbp_followup - sbp_baseline)
+  progressive-reveal: true
+title-block-banner: "#2e8b78"
+title-block-banner-color: white
+---
+
+## Two-Sample t-tests (Independent Samples)
+
+A **two-sample t-test** is used to compare the means of two *independent* groups.
+
+**Conditions:**
+
+- Random samples from each population
+- Independent samples (the two groups don't contain the same subjects, and observations aren't otherwise linked)
+- For *each* group: $n > 30$, __or__ the original variable follows a normal distribution in that population
+
+$$H_0: \mu_1 = \mu_2 \qquad \text{vs.} \qquad H_A: \mu_1 \ne \mu_2 \ \ (\text{or} \ <, \ >)$$
+
+By default, we'll use the version of this test that does __not__ assume the two groups have equal variances (sometimes called **Welch's t-test**). This is the safer default, since it doesn't require an extra assumption about equal variances&mdash;but you may see the equal-variance version used elsewhere, so we'll cover that too.
+
+Recall our hypertension drug trial from the previous file: 200 patients (100 Drug A, 100 Placebo), each with baseline and 12-week follow-up SBP. This time, we'll ask: __does the average change in SBP differ between the Drug A and Placebo groups?__
+
+### Creating a Factor Variable
+
+As before, let's start by creating a labeled factor column, `group`, from the numeric `group_num` (1 = Drug A, 2 = Placebo).
+
+```{code-blanks-instructions}
+Fill in the code below to create a new column, `group`, that labels `group_num == 1` as `"Drug A"` and `group_num == 2` as `"Placebo"`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group_num
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "Drug A"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "Placebo"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# create a labeled factor variable for treatment group
+htn_trial = htn_trial %>%
+  mutate(group = factor(group_num, levels = c(1, 2), labels = c("Drug A", "Placebo")))
+
+head(htn_trial)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# create a labeled factor variable for treatment group
+htn_trial = htn_trial %>%
+  mutate(group = factor(group_num, levels = c(1, 2), labels = c("Drug A", "Placebo")))
+
+head(htn_trial)
+```
+
+You should now see a `group` column with labels `"Drug A"` and `"Placebo"`. We'll use this throughout the rest of the file.
+:::
+
+### Plotting the Data
+
+```{code-blanks-instructions}
+Fill in the code below to create a boxplot of `sbp_change` by `group`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: sbp_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# boxplot of SBP change by group
+htn_trial %>%
+  ggplot(aes(x = group, y = sbp_change, color = group)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# boxplot of SBP change by group
+htn_trial %>%
+  ggplot(aes(x = group, y = sbp_change, color = group)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+The Drug A group should show a __larger decrease__ (more negative change) in SBP compared to the Placebo group.
+:::
+
+### Summary Statistics
+
+```{code-blanks-instructions}
+Fill in the code below to calculate the sample size, mean, and standard deviation of `sbp_change`, grouped by `group`.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: sbp_change
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# summary statistics by group
+htn_trial %>%
+  group_by(group) %>%
+  summarise(n = n(),
+            mean_change = mean(sbp_change),
+            sd_change = sd(sbp_change))
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# summary statistics by group
+htn_trial %>%
+  group_by(group) %>%
+  summarise(n = n(),
+            mean_change = mean(sbp_change),
+            sd_change = sd(sbp_change))
+```
+  group       n mean_change sd_change
+  <fct>   <int>       <dbl>     <dbl>
+1 Drug A    100      -13.8       12.5
+2 Placebo   100       -1.93      11.8
+
+Drug A averaged a change of about __-13.8 mmHg__ (sd &asymp; 12.5), compared to about __-1.93 mmHg__ (sd &asymp; 11.8) for Placebo&mdash;a sizable gap. We'll use these exact numbers (computed directly from the data, not hypothetical values) throughout the rest of this section.
+:::
+
+### Checking Conditions
+
+```{code-blanks-instructions}
+Fill in the code below to create a QQ plot of `sbp_change`, faceted by `group`, to check normality within each group.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# QQ plot of SBP change, faceted by group
+htn_trial %>%
+  ggplot(aes(sample = sbp_change)) +
+  stat_qq() +
+  stat_qq_line() +
+  facet_wrap(~ group) +
+  theme_bw()
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# QQ plot of SBP change, faceted by group
+htn_trial %>%
+  ggplot(aes(sample = sbp_change)) +
+  stat_qq() +
+  stat_qq_line() +
+  facet_wrap(~ group) +
+  theme_bw()
+```
+
+Both groups should look reasonably close to the reference line. Either way, with __n = 100 in each group__, we'd be comfortable relying on the CLT regardless.
+:::
+
+### Calculating the Test Statistic by Hand
+
+Let's calculate these valyes from our data: for each group, we'll pull out the relevant rows, then compute $\bar{y}$, $s$, and $n$.
+
+Recall the formula for a two-sample (Welch's) t-test statistic:
+
+$$t_{obs} = \dfrac{\bar{y}_1 - \bar{y}_2}{\sqrt{\dfrac{s_1^2}{n_1} + \dfrac{s_2^2}{n_2}}}$$
+
+```{code-blanks-instructions}
+Fill in the code below to calculate each group's summary statistics directly from `htn_trial`, then use them to calculate the standard error of the difference and the test statistic.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: ybar1
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: ybar2
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: se_diff
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+
+# group indices
+inds_a = which(htn_trial$group_num==1)
+inds_p = which(htn_trial$group_num!=1)
+# summary statistics
+ybar1 = mean(htn_trial$sbp_change[inds_a])
+s1 = sd(htn_trial$sbp_change[inds_a])
+n1 = length(inds_a)
+
+ybar2 = mean(htn_trial$sbp_change[inds_p])
+s2 = sd(htn_trial$sbp_change[inds_p])
+n2 = length(inds_p)
+
+# standard error of the difference
+se_diff = sqrt(s1^2 / n1 + s2^2 / n2)
+
+# test statistic
+t_obs = (ybar1 - ybar2) / se_diff
+t_obs
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# group indices
+inds_a = which(htn_trial$group_num==1)
+inds_p = which(htn_trial$group_num!=1)
+# summary statistics
+ybar1 = mean(htn_trial$sbp_change[inds_a])
+s1 = sd(htn_trial$sbp_change[inds_a])
+n1 = length(inds_a)
+
+ybar2 = mean(htn_trial$sbp_change[inds_p])
+s2 = sd(htn_trial$sbp_change[inds_p])
+n2 = length(inds_p)
+
+# standard error of the difference
+se_diff = sqrt(s1^2 / n1 + s2^2 / n2)
+
+# test statistic
+t_obs = (ybar1 - ybar2) / se_diff
+t_obs
+```
+[[1] -6.894724]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+A test statistic of __-6.89__ is quite large in magnitude, suggesting a substantial difference between groups relative to the standard error.
+:::
+
+### Degrees of Freedom (Welch-Satterthwaite)
+
+Unlike the one-sample or equal-variance tests, Welch's t-test uses a more complicated (and typically non-whole-number) degrees of freedom:
+
+$$df^* = \dfrac{\left(\dfrac{s_1^2}{n_1} + \dfrac{s_2^2}{n_2}\right)^2}{\dfrac{(s_1^2/n_1)^2}{n_1 - 1} + \dfrac{(s_2^2/n_2)^2}{n_2 - 1}}$$
+
+For our example, the modified degrees of freedom are:
+
+```{code-blanks}
+# pieces of the formula
+A = s1^2 / n1
+B = s2^2 / n2
+
+# degrees of freedom
+df_star = (A + B)^2 / (A^2 / (n1 - 1) + B^2 / (n2 - 1))
+df_star
+```
+
+Notice this comes out close to, but not exactly, $n_1 + n_2 - 2 = 198$ (the degrees of freedom we'd use for the equal-variance version).
+
+### Rejection Region and P-value
+
+```{code-blanks-instructions}
+Fill in the code below to find the two-sided rejection region cutoffs (at $\alpha = 0.05$) and the p-value for our test.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.025
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.975
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: df_star
+#|   prefill: false
+#|   occurrence: 2
+#|   match: token
+#| blank:
+#|   target: F
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# rejection region cutoffs
+qt(c(0.025, 0.975), df = df_star)
+
+# p-value
+pt(abs(t_obs), df = df_star, lower.tail = F) * 2
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# rejection region cutoffs
+qt(c(0.025, 0.975), df = df_star)
+```
+[[1] -1.972151 1.972151]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+``` r
+# p-value
+pt(abs(t_obs), df = df_star, lower.tail = F) * 2
+```
+[[1] 7.116097e-11]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+Our test statistic (-6.89) is far beyond the rejection region cutoffs ($\pm$ 1.97), and the p-value is __very small__ (about 7.1 &times; 10<sup>-11</sup>). We'd reject $H_0$ and conclude the average change in SBP really does differ between groups.
+:::
+
+### Confidence Interval
+
+```{code-blanks-instructions}
+Fill in the code below to calculate a 95% confidence interval for the difference in means ($\mu_1 - \mu_2$).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 0.025
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.975
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: df_star
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# 95% confidence interval for the difference in means
+(ybar1 - ybar2) + qt(c(0.025, 0.975), df = df_star) * se_diff
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# 95% confidence interval for the difference in means
+(ybar1 - ybar2) + qt(c(0.025, 0.975), df = df_star) * se_diff
+```
+[[1] -15.203755  -8.440838]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+We are 95% confident that the true difference in mean SBP change (Drug A minus Placebo) is between about __-15.2 and -8.44__&mdash;entirely below 0, consistent with our test results.
+:::
+
+### Using `t.test()`
+
+```{code-blanks-instructions}
+Fill in the code below to run a two-sample t-test comparing `sbp_change` between the two levels of `group`, using the formula interface. By default, `t.test()` uses Welch's (unequal variance) version.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# two-sample t-test (Welch's, the default)
+t.test(sbp_change ~ group, data = htn_trial)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# two-sample t-test (Welch's, the default)
+t.test(sbp_change ~ group, data = htn_trial)
+```
+
+Since our hand calculation above was computed directly from this same data (rather than from hypothetical summary statistics), this should match almost exactly: a test statistic of about -6.89, roughly 195.8 degrees of freedom, and a p-value around 7.1 &times; 10<sup>-11</sup>.
+:::
+
+```{code-blanks-response}
+Compare the output of `t.test()` to our manual calculations above. Do the numbers match closely? Why would you expect that, given that both approaches used the same underlying data?
+```
+
+### Equal-Variance Version (Appendix)
+
+You may occasionally see the __equal-variance__ version of the two-sample t-test used instead (sometimes called the "pooled" t-test). This version assumes both groups share the same population variance, and uses a pooled variance estimate along with simpler degrees of freedom ($n_1 + n_2 - 2$).
+
+```{code-blanks-instructions}
+Fill in the code below to run the equal-variance version of this test, using the `var.equal = T` argument.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: sbp_change
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: group
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: T
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# equal-variance ("pooled") two-sample t-test
+t.test(sbp_change ~ group, data = htn_trial, var.equal = T)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# equal-variance ("pooled") two-sample t-test
+t.test(sbp_change ~ group, data = htn_trial, var.equal = T)
+```
+
+In our case, the two versions should give very similar results, since the two groups' standard deviations (around 10 and 9) aren't drastically different. The difference between the two versions tends to matter more when the groups' variances are substantially different.
+:::
+
+```{code-blanks-response}
+In general, which version of the two-sample t-test (Welch's or equal-variance) is considered the safer default when you're not sure whether the two groups have equal variances? Why?
+```
+
+## Power and Sample Size
+
+```{code-blanks-instructions}
+Suppose we want to detect a difference (`delta`) of __5 mmHg__ between groups, assuming a common standard deviation of __9.51__, with a significance level of __0.05__ and __80% power__, using a __two-sided__, two-sample test. Fill in the code below to find the required sample size (per group).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: 5
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 9.51
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.8
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: 0.05
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "two.sample"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+#| blank:
+#|   target: "two.sided"
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# required sample size (per group) for 80% power
+power.t.test(delta = 5,
+             sd = 9.51, 
+             power = 0.8, 
+             sig.level = 0.05,
+             type = "two.sample", 
+             alternative = "two.sided")
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# required sample size (per group) for 80% power
+power.t.test(delta = 5,
+             sd = 9.51, 
+             power = 0.8, 
+             sig.level = 0.05,
+             type = "two.sample", 
+             alternative = "two.sided")
+```
+
+[n = 57.7644]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+We'd need about __58 patients per group__ (always round up!) to have an 80% chance of detecting a 5 mmHg difference, if one exists. Since our actual trial has 100 per group, we have __more than enough__ power for this effect size.
+:::
+
+```{code-blanks-response}
+Our actual trial has n = 100 per group, more than the 58 required for 80% power to detect a 5 mmHg difference. Would you expect our *actual* power (for a 5 mmHg difference, at n = 100) to be higher or lower than 80%? You can check using `power.t.test()` with `n = 100` instead of solving for `power`.
+```

@@ -1,0 +1,138 @@
+---
+title: "Module 5: Categorical Data, Part III"
+description: "Fill-in-the-blank coding exercises for Module 5: Fisher's Exact Test"
+author: "Haley Grant"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 1
+    smart: false
+filters:
+  - code-blanks
+code-blanks:
+  packages:
+    - tidyverse
+  setup:
+    - library(tidyverse)
+  progressive-reveal: true
+title-block-banner: "#7d4f9c"
+title-block-banner-color: white
+---
+
+## Fisher's Exact Test
+
+**Fisher's exact test** is used for the same kind of question as the chi-squared test of independence/homogeneity (is there an association between two categorical variables?), but it doesn't rely on the chi-squared approximation&mdash;which breaks down when expected cell counts are small. Instead, it calculates an __exact__ p-value based on the hypergeometric distribution.
+
+**Rule of thumb:** if any expected cell count in your table is below 5, prefer Fisher's exact test over the chi-squared test.
+
+**Motivating example:** In a small safety sub-study, researchers compared the rate of a __rare severe allergic reaction__ between two vaccine brands. Out of __25 patients__ given Brand X, __1__ had a severe reaction (24 did not). Out of __20 patients__ given Brand Y, __5__ had a severe reaction (15 did not). Is there an association between vaccine brand and reaction rate?
+
+### Setting Up the Table
+
+Here's our table of counts, with rows for vaccine brand and columns for reaction status:
+
+```{code-blanks}
+# table of counts: rows = vaccine brand, columns = reaction (yes, no)
+tbl = matrix(c(1, 24, 5, 15), nrow = 2, byrow = T)
+rownames(tbl) = c("Brand X", "Brand Y")
+colnames(tbl) = c("Reaction", "No Reaction")
+tbl
+```
+
+### Checking Expected Counts
+
+```{code-blanks-instructions}
+Fill in the code below to check the expected cell counts using `chisq.test()$expected` (even though we won't trust the chi-squared p-value itself, this is still a quick way to check the expected counts).
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# expected counts under chi-squared assumptions
+chisq.test(tbl, correct = F)$expected
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# expected counts under chi-squared assumptions
+chisq.test(tbl, correct = F)$expected
+```
+
+Two of the four expected counts (around 3.3 and 2.7) are __below 5__&mdash;the chi-squared test's assumptions are violated here. This is exactly the situation Fisher's exact test is designed for.
+:::
+
+```{code-blanks-response}
+Why does a small expected cell count cause problems for the chi-squared test specifically? (Hint: think about what the chi-squared distribution is approximating, and how well that approximation works with very few observations in a cell.)
+```
+
+### Running Fisher's Exact Test
+
+```{code-blanks-instructions}
+Fill in the code below to run Fisher's exact test on the table.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# Fisher's exact test
+fisher.test(tbl)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# Fisher's exact test
+fisher.test(tbl)
+```
+[[1] p-value = 0.07409, odds ratio = 0.1253912]{style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;"}
+
+With a p-value of about 0.074, we're just __above__ the conventional 0.05 threshold&mdash;not quite enough evidence to conclude the reaction rates differ between brands, though the estimated odds ratio (about 0.13, meaning the odds of a reaction are much lower for Brand X) suggests this might be worth investigating with a larger sample.
+:::
+
+```{code-blanks-response}
+Fisher's exact test gave us a p-value, but we didn't need to specify a test statistic or distribution (like we would for a t-test or chi-squared test) to get there. In your own words, what is Fisher's exact test actually calculating to arrive at this p-value?
+```
+
+### Comparing to the Chi-Squared Test
+
+```{code-blanks-instructions}
+For comparison, fill in the code below to run the (technically invalid, given our small expected counts) chi-squared test on the same table, and compare the p-values.
+```
+
+```{code-blanks}
+#| blank:
+#|   target: tbl
+#|   prefill: false
+#|   occurrence: 1
+#|   match: token
+
+# chi-squared test (for comparison only - not actually valid here!)
+chisq.test(tbl, correct = F)
+```
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+``` r
+# chi-squared test (for comparison only - not actually valid here!)
+chisq.test(tbl, correct = F)
+```
+
+R may give a warning here (something like "Chi-squared approximation may be incorrect") precisely because of the small expected counts we checked earlier. The resulting p-value may be noticeably different from Fisher's exact p-value&mdash;a good illustration of why checking conditions matters before trusting a test's output.
+:::
+
+```{code-blanks-response}
+Even if R lets you run `chisq.test()` without an error (just a warning), why is it important not to just use whichever test gives you the smaller p-value?
+```
