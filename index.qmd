@@ -83,8 +83,7 @@ Practice hypothesis tests for categorical variables.
 
 - [Tests for One Proportion→](modules/module5/one_proportion.qmd)
 - [McNemar's Test (Paired)→](modules/module5/mcnemars.qmd)
-- [Chi-squared Tests→](modules/module5/chi_squared.qmd)
-- [Fisher's Exact Test→](modules/module5/fishers_exact.qmd)
+- [Chi-squared & Fisher's Exact Tests→](modules/module5/chi_squared.qmd)
 
 </div>
 

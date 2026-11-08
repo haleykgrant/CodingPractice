@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Haley Grant">
-<meta name="description" content="Fill-in-the-blank coding exercises for Module 5: Chi-Squared Tests">
+<meta name="description" content="Fill-in-the-blank coding exercises for Module 5: Chi-Squared Tests &amp; Fisher’s Exact Test">
 
 <title>CodingPractice - Module 5: Categorical Data, Part II</title>
 <style>
@@ -198,7 +198,7 @@ window.Quarto = {
       <h1 class="title">Module 5: Categorical Data, Part II</h1>
                   <div>
         <div class="description">
-          Fill-in-the-blank coding exercises for Module 5: Chi-Squared Tests
+          Fill-in-the-blank coding exercises for Module 5: Chi-Squared Tests &amp; Fisher’s Exact Test
         </div>
       </div>
                 </div>
@@ -480,8 +480,114 @@ Solution
 <p>We checked that all of our expected cell counts were 10 or 90—comfortably above the usual rule-of-thumb minimum of 5. What would you do differently if several expected cell counts came out below 5?</p>
 <textarea class="code-blanks-response" rows="2"></textarea>
 </div>
+</section>
+<section id="fishers-exact-test" class="level2">
+<h2 class="anchored" data-anchor-id="fishers-exact-test">Fisher’s Exact Test</h2>
+<p><strong>Fisher’s exact test</strong> is used for the same kind of question as the chi-squared test of independence/homogeneity (is there an association between two categorical variables?), but it doesn’t rely on the chi-squared approximation—which breaks down when expected cell counts are small. Instead, it calculates an <strong>exact</strong> p-value based on the hypergeometric distribution.</p>
+<p><strong>Rule of thumb:</strong> if any expected cell count in your table is below 5, prefer Fisher’s exact test over the chi-squared test.</p>
+<p><strong>Motivating example:</strong> In a small safety sub-study, researchers compared the rate of a <strong>rare severe allergic reaction</strong> between two vaccine brands. Out of <strong>25 patients</strong> given Brand X, <strong>1</strong> had a severe reaction (24 did not). Out of <strong>20 patients</strong> given Brand Y, <strong>5</strong> had a severe reaction (15 did not). Is there an association between vaccine brand and reaction rate?</p>
+<section id="setting-up-the-table-1" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-table-1">Setting Up the Table</h3>
+<p>Here’s our table of counts, with rows for vaccine brand and columns for reaction status:</p>
+<pre class="code-blanks"><code># table of counts: rows = vaccine brand, columns = reaction (yes, no)
+tbl = matrix(c(1, 24, 5, 15), nrow = 2, byrow = T)
+rownames(tbl) = c("Brand X", "Brand Y")
+colnames(tbl) = c("Reaction", "No Reaction")
+tbl</code></pre>
+</section>
+<section id="checking-expected-counts-1" class="level3">
+<h3 class="anchored" data-anchor-id="checking-expected-counts-1">Checking Expected Counts</h3>
+<div class="code-blanks-instructions-box">
+<p>Fill in the code below to check the expected cell counts using <code>chisq.test()$expected</code> (even though we won’t trust the chi-squared p-value itself, this is still a quick way to check the expected counts).</p>
+</div>
+<pre class="code-blanks"><code># expected counts under chi-squared assumptions
+chisq.test(<input class="code-blank-input" data-answer="tbl" data-default="" value="" size="5">, correct = F)$expected</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># expected counts under chi-squared assumptions</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(tbl, <span class="at">correct =</span> F)<span class="sc">$</span>expected</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Two of the four expected counts (around 3.3 and 2.7) are <strong>below 5</strong>—the chi-squared test’s assumptions are violated here. This is exactly the situation Fisher’s exact test is designed for.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>Why does a small expected cell count cause problems for the chi-squared test specifically? (Hint: think about what the chi-squared distribution is approximating, and how well that approximation works with very few observations in a cell.)</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
+</section>
+<section id="running-fishers-exact-test" class="level3">
+<h3 class="anchored" data-anchor-id="running-fishers-exact-test">Running Fisher’s Exact Test</h3>
+<div class="code-blanks-instructions-box">
+<p>Fill in the code below to run Fisher’s exact test on the table.</p>
+</div>
+<pre class="code-blanks"><code># Fisher's exact test
+fisher.test(<input class="code-blank-input" data-answer="tbl" data-default="" value="" size="5">)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fisher's exact test</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fisher.test</span>(tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="font-family: 'Monaco'; font-weight: 500; font-size : 12px;">[1] p-value = 0.07409, odds ratio = 0.1253912</span></p>
+<p>With a p-value of about 0.074, we’re just <strong>above</strong> the conventional 0.05 threshold—not quite enough evidence to conclude the reaction rates differ between brands, though the estimated odds ratio (about 0.13, meaning the odds of a reaction are much lower for Brand X) suggests this might be worth investigating with a larger sample.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>Fisher’s exact test gave us a p-value, but we didn’t need to specify a test statistic or distribution (like we would for a t-test or chi-squared test) to get there. In your own words, what is Fisher’s exact test actually calculating to arrive at this p-value?</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
+</section>
+<section id="comparing-to-the-chi-squared-test" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-to-the-chi-squared-test">Comparing to the Chi-Squared Test</h3>
+<div class="code-blanks-instructions-box">
+<p>For comparison, fill in the code below to run the (technically invalid, given our small expected counts) chi-squared test on the same table, and compare the p-values.</p>
+</div>
+<pre class="code-blanks"><code># chi-squared test (for comparison only - not actually valid here!)
+chisq.test(<input class="code-blank-input" data-answer="tbl" data-default="" value="" size="5">, correct = F)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># chi-squared test (for comparison only - not actually valid here!)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(tbl, <span class="at">correct =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>R may give a warning here (something like “Chi-squared approximation may be incorrect”) precisely because of the small expected counts we checked earlier. The resulting p-value may be noticeably different from Fisher’s exact p-value—a good illustration of why checking conditions matters before trusting a test’s output.</p>
+</div>
+</div>
+</div>
+<div class="code-blanks-response-box">
+<p>Even if R lets you run <code>chisq.test()</code> without an error (just a warning), why is it important not to just use whichever test gives you the smaller p-value?</p>
+<textarea class="code-blanks-response" rows="2"></textarea>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
